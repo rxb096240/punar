@@ -1,4 +1,4 @@
--- duewell: households, recurring items, bills + payments, todos
+-- Punar: households, recurring items, bills + payments, todos
 -- Run this in the Supabase SQL editor (or via `supabase db push`).
 
 create extension if not exists pgcrypto;

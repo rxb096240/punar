@@ -32,7 +32,7 @@ export function OnboardingPage() {
     <div className="auth-page">
       <div className="auth-card">
         <h1>
-          duewell<span className="dot">.</span>
+          Punar<span className="dot">.</span>
         </h1>
         <p className="sub">set up your household</p>
 

@@ -1,4 +1,4 @@
-# duewell
+# Punar
 
 A household tracker for recurring chores/maintenance, bills (with payment
 history), and general to-dos — shared across a household via Supabase.
