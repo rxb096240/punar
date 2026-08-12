@@ -27,20 +27,27 @@ Supabase (Postgres + Auth + Row Level Security).
 
 ## Setup
 
-1. Create a [Supabase](https://supabase.com) project.
+Punar's tables live in their own `punar` Postgres schema (not `public`), so
+it's safe to run this in a Supabase project that already hosts another app
+— nothing here will collide with that app's tables.
+
+1. Pick a [Supabase](https://supabase.com) project (new or existing).
 2. In the Supabase SQL editor, run `supabase/migrations/0001_init.sql`.
-   This creates all tables, RLS policies, and the RPCs the app calls
-   (`create_household`, `join_household`, `pay_bill`).
-3. Copy `.env.example` to `.env` and fill in your project's URL and anon
+   This creates the `punar` schema, all its tables, RLS policies, and the
+   RPCs the app calls (`create_household`, `join_household`, `pay_bill`).
+3. Go to **Project Settings → API → Data API** and add `punar` to
+   **Exposed schemas** (it only exposes `public` by default — without this
+   step the app can't see any of its tables).
+4. Copy `.env.example` to `.env` and fill in the project's URL and anon
    key (Project Settings → API).
-4. Install dependencies and start the dev server:
+5. Install dependencies and start the dev server:
 
    ```bash
    npm install
    npm run dev
    ```
 
-5. Sign up, then either create a new household or join one with an
+6. Sign up, then either create a new household or join one with an
    invite code (shown in the app header once you're in one).
 
 ## Scripts

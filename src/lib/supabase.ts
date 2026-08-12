@@ -9,4 +9,7 @@ if (!url || !anonKey) {
   );
 }
 
-export const supabase = createClient(url, anonKey);
+export const supabase = createClient(url, anonKey, {
+  db: { schema: 'punar' },
+  auth: { storageKey: 'punar-auth' },
+});
