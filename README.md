@@ -16,6 +16,8 @@ Supabase (Postgres + Auth + Row Level Security).
 - **Households** — sign up, create or join a household via invite code,
   and everyone in the household sees the same data (enforced by Postgres
   Row Level Security, not just the client).
+- Every new household is automatically seeded with a **Utilities** bill
+  group (Electricity, Atmos Gas, Water + Trash, Internet, Cable).
 
 ## Stack
 
@@ -32,8 +34,9 @@ it's safe to run this in a Supabase project that already hosts another app
 — nothing here will collide with that app's tables.
 
 1. Pick a [Supabase](https://supabase.com) project (new or existing).
-2. In the Supabase SQL editor, run `supabase/migrations/0001_init.sql`.
-   This creates the `punar` schema, all its tables, RLS policies, and the
+2. In the Supabase SQL editor, run the migrations in `supabase/migrations/`
+   in order (`0001_init.sql`, then `0002_seed_utilities.sql`). Together
+   they create the `punar` schema, all its tables, RLS policies, and the
    RPCs the app calls (`create_household`, `join_household`, `pay_bill`).
 3. Go to **Project Settings → API → Data API** and add `punar` to
    **Exposed schemas** (it only exposes `public` by default — without this

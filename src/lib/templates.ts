@@ -46,7 +46,6 @@ export const BILL_TEMPLATES: {
     items: [
       { name: 'Property tax', interval: 180 },
       { name: 'Home insurance', interval: 365 },
-      { name: 'Internet', interval: 30 },
     ],
   },
 ];
