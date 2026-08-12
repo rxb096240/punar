@@ -51,6 +51,32 @@ export function useBills(householdId: string | undefined) {
     await refresh();
   }
 
+  async function updateBill(
+    id: string,
+    input: {
+      groupId: string;
+      name: string;
+      amount: number | null;
+      nextDueDate: string;
+      intervalDays: number;
+      autopay: boolean;
+    }
+  ) {
+    const { error } = await supabase
+      .from('bills')
+      .update({
+        group_id: input.groupId,
+        name: input.name,
+        amount: input.amount,
+        next_due_date: input.nextDueDate,
+        interval_days: input.intervalDays,
+        autopay: input.autopay,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    await refresh();
+  }
+
   async function payBill(id: string, amount: number | null, paidDate: string = todayISO()) {
     const { error } = await supabase.rpc('pay_bill', {
       p_bill_id: id,
@@ -67,5 +93,5 @@ export function useBills(householdId: string | undefined) {
     await refresh();
   }
 
-  return { bills, loading, refresh, addBill, payBill, removeBill };
+  return { bills, loading, refresh, addBill, updateBill, payBill, removeBill };
 }

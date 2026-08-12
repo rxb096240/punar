@@ -40,6 +40,19 @@ export function useTodos(householdId: string | undefined) {
     await refresh();
   }
 
+  async function updateTodo(id: string, input: { title: string; notes?: string; dueDate?: string | null }) {
+    const { error } = await supabase
+      .from('todos')
+      .update({
+        title: input.title,
+        notes: input.notes || null,
+        due_date: input.dueDate || null,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    await refresh();
+  }
+
   async function toggleTodo(id: string, completed: boolean) {
     const { error } = await supabase
       .from('todos')
@@ -55,5 +68,5 @@ export function useTodos(householdId: string | undefined) {
     await refresh();
   }
 
-  return { todos, loading, refresh, addTodo, toggleTodo, removeTodo };
+  return { todos, loading, refresh, addTodo, updateTodo, toggleTodo, removeTodo };
 }

@@ -8,11 +8,13 @@ import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
 import { daysUntilFromLast, urgency, formatDue, addDaysISO } from '../lib/dates';
+import type { RecurringItem } from '../lib/types';
 
 export function RecurringPage() {
   const { groups, recurring } = useData();
   const [activeGroup, setActiveGroup] = useState('All');
   const [addOpen, setAddOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<RecurringItem | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
 
   const groupById = useMemo(() => new Map(groups.groups.map((g) => [g.id, g])), [groups.groups]);
@@ -32,6 +34,11 @@ export function RecurringPage() {
       await recurring.addItem({ groupId: group.id, name: item.name, lastDate: new Date().toISOString().slice(0, 10), intervalDays: item.interval });
     }
     setActiveGroup(group.id);
+  }
+
+  function closeSheet() {
+    setAddOpen(false);
+    setEditingItem(null);
   }
 
   return (
@@ -64,6 +71,7 @@ export function RecurringPage() {
                   urgency={urgency(it.days)}
                   doneTitle="Mark done"
                   onDone={() => recurring.markDone(it.id)}
+                  onEdit={() => setEditingItem(it)}
                   onRemove={() => recurring.removeItem(it.id)}
                 />
               );
@@ -76,11 +84,13 @@ export function RecurringPage() {
 
       <AddGroupSheet open={groupSheetOpen} onClose={() => setGroupSheetOpen(false)} onCreate={groups.createGroup} />
       <AddRecurringSheet
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
+        open={addOpen || !!editingItem}
+        onClose={closeSheet}
         groups={groups.groups}
         defaultGroupId={activeGroup === 'All' ? null : activeGroup}
+        editing={editingItem}
         onAdd={recurring.addItem}
+        onUpdate={recurring.updateItem}
         onNewGroup={() => {
           setAddOpen(false);
           setGroupSheetOpen(true);

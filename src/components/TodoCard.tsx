@@ -1,14 +1,16 @@
 import type { Todo } from '../lib/types';
-import { CheckIcon, TrashIcon } from './icons';
+import { CheckIcon, TrashIcon, EditIcon } from './icons';
 import { daysUntil, formatDue, urgency } from '../lib/dates';
 
 export function TodoCard({
   todo,
   onToggle,
+  onEdit,
   onRemove,
 }: {
   todo: Todo;
   onToggle: () => void;
+  onEdit: () => void;
   onRemove: () => void;
 }) {
   const days = todo.due_date ? daysUntil(todo.due_date) : null;
@@ -31,6 +33,9 @@ export function TodoCard({
       <div className="actions">
         <button className={todo.completed ? '' : 'done'} title={todo.completed ? 'Mark not done' : 'Mark done'} onClick={onToggle}>
           <CheckIcon />
+        </button>
+        <button title="Edit" onClick={onEdit}>
+          <EditIcon />
         </button>
         <button title="Remove" onClick={onRemove}>
           <TrashIcon />

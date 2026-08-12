@@ -15,6 +15,7 @@ export function BillsPage() {
   const { groups, bills } = useData();
   const [activeGroup, setActiveGroup] = useState('All');
   const [addOpen, setAddOpen] = useState(false);
+  const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
   const [payingBill, setPayingBill] = useState<Bill | null>(null);
 
@@ -42,6 +43,11 @@ export function BillsPage() {
       });
     }
     setActiveGroup(group.id);
+  }
+
+  function closeSheet() {
+    setAddOpen(false);
+    setEditingBill(null);
   }
 
   return (
@@ -75,6 +81,7 @@ export function BillsPage() {
                   urgency={urgency(b.days)}
                   doneTitle="Mark paid"
                   onDone={() => setPayingBill(b)}
+                  onEdit={() => setEditingBill(b)}
                   onRemove={() => bills.removeBill(b.id)}
                 />
               );
@@ -87,11 +94,13 @@ export function BillsPage() {
 
       <AddGroupSheet open={groupSheetOpen} onClose={() => setGroupSheetOpen(false)} onCreate={groups.createGroup} />
       <AddBillSheet
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
+        open={addOpen || !!editingBill}
+        onClose={closeSheet}
         groups={groups.groups}
         defaultGroupId={activeGroup === 'All' ? null : activeGroup}
+        editing={editingBill}
         onAdd={bills.addBill}
+        onUpdate={bills.updateBill}
         onNewGroup={() => {
           setAddOpen(false);
           setGroupSheetOpen(true);
