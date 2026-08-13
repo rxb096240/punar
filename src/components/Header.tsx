@@ -1,8 +1,9 @@
 import { supabase } from '../lib/supabase';
 import { useHousehold } from '../context/HouseholdContext';
+import { HouseholdSwitcher } from './HouseholdSwitcher';
 
 export function Header() {
-  const { household } = useHousehold();
+  const { household, households, selectHousehold, renameHousehold, createHousehold } = useHousehold();
 
   function copyInvite() {
     if (household) navigator.clipboard.writeText(household.invite_code).catch(() => {});
@@ -15,22 +16,24 @@ export function Header() {
           <h1>
             Punar<span className="dot">.</span>
           </h1>
-          <p className="sub">
-            {household ? household.name : 'everything recurring, one glance'}
-            {household && (
-              <>
-                {' · '}
-                <button
-                  type="button"
-                  onClick={copyInvite}
-                  style={{ background: 'none', border: 'none', color: 'inherit', font: 'inherit', cursor: 'pointer', padding: 0 }}
-                  title="Copy invite code"
-                >
+          {household ? (
+            <>
+              <HouseholdSwitcher
+                household={household}
+                households={households}
+                onSelect={selectHousehold}
+                onRename={renameHousehold}
+                onCreate={createHousehold}
+              />
+              <p className="invite-note">
+                <button type="button" onClick={copyInvite} title="Copy invite code">
                   invite: {household.invite_code}
                 </button>
-              </>
-            )}
-          </p>
+              </p>
+            </>
+          ) : (
+            <p className="sub">everything recurring, one glance</p>
+          )}
         </div>
         <button className="signout" onClick={() => supabase.auth.signOut()}>
           Sign out
