@@ -28,6 +28,8 @@ export function HouseholdSwitcher({
   const [open, setOpen] = useState(false);
   const [renamingId, setRenamingId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [renameError, setRenameError] = useState('');
+  const [renameBusy, setRenameBusy] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
@@ -46,13 +48,32 @@ export function HouseholdSwitcher({
   function startRename(h: Household) {
     setRenamingId(h.id);
     setRenameValue(h.name);
+    setRenameError('');
+  }
+
+  function cancelRename() {
+    setRenamingId(null);
+    setRenameError('');
   }
 
   async function commitRename() {
     const id = renamingId;
     const value = renameValue.trim();
-    setRenamingId(null);
-    if (id && value) await onRename(id, value);
+    if (!id) return;
+    if (!value) {
+      setRenameError('Name can’t be empty.');
+      return;
+    }
+    setRenameBusy(true);
+    setRenameError('');
+    try {
+      await onRename(id, value);
+      setRenamingId(null);
+    } catch (err) {
+      setRenameError(err instanceof Error ? err.message : 'Could not rename.');
+    } finally {
+      setRenameBusy(false);
+    }
   }
 
   return (
@@ -66,22 +87,26 @@ export function HouseholdSwitcher({
         <div className="hh-list">
           {households.map((h) =>
             renamingId === h.id ? (
-              <div className="hh-rename" key={h.id}>
-                <input
-                  autoFocus
-                  value={renameValue}
-                  onChange={(e) => setRenameValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') commitRename();
-                    if (e.key === 'Escape') setRenamingId(null);
-                  }}
-                />
-                <button type="button" className="confirm" title="Save" onClick={commitRename}>
-                  <CheckIcon />
-                </button>
-                <button type="button" className="cancel" title="Cancel" onClick={() => setRenamingId(null)}>
-                  ×
-                </button>
+              <div className="hh-rename-wrap" key={h.id}>
+                <div className="hh-rename">
+                  <input
+                    autoFocus
+                    value={renameValue}
+                    disabled={renameBusy}
+                    onChange={(e) => setRenameValue(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') commitRename();
+                      if (e.key === 'Escape') cancelRename();
+                    }}
+                  />
+                  <button type="button" className="confirm" title="Save" disabled={renameBusy} onClick={commitRename}>
+                    <CheckIcon />
+                  </button>
+                  <button type="button" className="cancel" title="Cancel" disabled={renameBusy} onClick={cancelRename}>
+                    ×
+                  </button>
+                </div>
+                {renameError && <p className="hh-error">{renameError}</p>}
               </div>
             ) : (
               <div
