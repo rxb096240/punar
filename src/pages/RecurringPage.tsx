@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useData } from '../context/DataContext';
-import { GroupChips } from '../components/GroupChips';
+import { CategorySectionHeader } from '../components/CategorySectionHeader';
+import { AddCategoryTile } from '../components/AddCategoryTile';
 import { DueCard } from '../components/DueCard';
 import { Fab } from '../components/Fab';
 import { AddGroupSheet } from '../components/AddGroupSheet';
@@ -8,32 +9,45 @@ import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
 import { daysUntilFromLast, urgency, formatDue, addDaysISO } from '../lib/dates';
-import type { RecurringItem } from '../lib/types';
+import type { IconKey, RecurringItem } from '../lib/types';
+
+type WithDays = RecurringItem & { days: number };
+
+const UNCATEGORIZED = '__uncategorized';
 
 export function RecurringPage() {
   const { groups, recurring } = useData();
-  const [activeGroup, setActiveGroup] = useState('All');
   const [addOpen, setAddOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<RecurringItem | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
 
-  const groupById = useMemo(() => new Map(groups.groups.map((g) => [g.id, g])), [groups.groups]);
+  const itemsByGroup = useMemo(() => {
+    const map = new Map<string, WithDays[]>();
+    for (const it of recurring.items) {
+      const key = it.group_id ?? UNCATEGORIZED;
+      const withDays: WithDays = { ...it, days: daysUntilFromLast(it.last_date, it.interval_days) };
+      const arr = map.get(key);
+      if (arr) arr.push(withDays);
+      else map.set(key, [withDays]);
+    }
+    for (const arr of map.values()) arr.sort((a, b) => a.days - b.days);
+    return map;
+  }, [recurring.items]);
 
-  const visible = useMemo(() => {
-    return recurring.items
-      .filter((it) => activeGroup === 'All' || it.group_id === activeGroup)
-      .map((it) => ({ ...it, days: daysUntilFromLast(it.last_date, it.interval_days) }))
-      .sort((a, b) => a.days - b.days);
-  }, [recurring.items, activeGroup]);
+  const uncategorized = itemsByGroup.get(UNCATEGORIZED) ?? [];
 
   async function useTemplate(index: number) {
     const t = RECURRING_TEMPLATES[index];
     let group = groups.groups.find((g) => g.name === t.group);
     if (!group) group = await groups.createGroup(t.group, t.icon);
     for (const item of t.items) {
-      await recurring.addItem({ groupId: group.id, name: item.name, lastDate: new Date().toISOString().slice(0, 10), intervalDays: item.interval });
+      await recurring.addItem({
+        groupId: group.id,
+        name: item.name,
+        lastDate: new Date().toISOString().slice(0, 10),
+        intervalDays: item.interval,
+      });
     }
-    setActiveGroup(group.id);
   }
 
   function closeSheet() {
@@ -41,42 +55,51 @@ export function RecurringPage() {
     setEditingItem(null);
   }
 
+  function renderCard(it: WithDays, icon: IconKey) {
+    return (
+      <DueCard
+        key={it.id}
+        icon={icon}
+        name={it.name}
+        meta={`due ${formatDue(addDaysISO(it.last_date, it.interval_days))}`}
+        days={it.days}
+        urgency={urgency(it.days)}
+        doneTitle="Mark done"
+        onDone={() => recurring.markDone(it.id)}
+        onEdit={() => setEditingItem(it)}
+        onRemove={() => recurring.removeItem(it.id)}
+      />
+    );
+  }
+
   return (
     <>
-      <GroupChips
-        groups={groups.groups}
-        active={activeGroup}
-        onSelect={setActiveGroup}
-        onNewGroup={() => setGroupSheetOpen(true)}
-      />
-
       {recurring.items.length === 0 ? (
         <TemplatesGrid templates={RECURRING_TEMPLATES} onUse={useTemplate} emptyHint="start with a set, or add your own" />
       ) : (
-        <div className="cards">
-          {visible.length === 0 ? (
-            <div className="empty">
-              <p>nothing in this group yet</p>
+        <div className="board">
+          {groups.groups.map((g) => {
+            const items = itemsByGroup.get(g.id) ?? [];
+            return (
+              <div className="board-col" key={g.id}>
+                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} />
+                {items.length === 0 ? (
+                  <p className="empty-mini">nothing here yet</p>
+                ) : (
+                  <div className="col-cards">{items.map((it) => renderCard(it, g.icon))}</div>
+                )}
+              </div>
+            );
+          })}
+
+          {uncategorized.length > 0 && (
+            <div className="board-col">
+              <CategorySectionHeader icon="star" name="Uncategorized" count={uncategorized.length} />
+              <div className="col-cards">{uncategorized.map((it) => renderCard(it, 'star'))}</div>
             </div>
-          ) : (
-            visible.map((it) => {
-              const group = it.group_id ? groupById.get(it.group_id) : undefined;
-              return (
-                <DueCard
-                  key={it.id}
-                  icon={group?.icon ?? 'star'}
-                  name={it.name}
-                  meta={`${group?.name ?? 'Uncategorized'} · due ${formatDue(addDaysISO(it.last_date, it.interval_days))}`}
-                  days={it.days}
-                  urgency={urgency(it.days)}
-                  doneTitle="Mark done"
-                  onDone={() => recurring.markDone(it.id)}
-                  onEdit={() => setEditingItem(it)}
-                  onRemove={() => recurring.removeItem(it.id)}
-                />
-              );
-            })
           )}
+
+          <AddCategoryTile onClick={() => setGroupSheetOpen(true)} />
         </div>
       )}
 
@@ -87,7 +110,7 @@ export function RecurringPage() {
         open={addOpen || !!editingItem}
         onClose={closeSheet}
         groups={groups.groups}
-        defaultGroupId={activeGroup === 'All' ? null : activeGroup}
+        defaultGroupId={null}
         editing={editingItem}
         onAdd={recurring.addItem}
         onUpdate={recurring.updateItem}

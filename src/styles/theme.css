@@ -188,40 +188,72 @@ header.app-header .signout {
   color: #fff;
 }
 
-.chips {
+.section-head {
   display: flex;
+  align-items: center;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 14px;
-  scrollbar-width: none;
+  margin-bottom: 10px;
 }
-.chips::-webkit-scrollbar {
-  display: none;
-}
-.chip {
+.section-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: var(--violet-soft);
+  color: var(--violet);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  background: var(--card);
-  border: 2px solid transparent;
-  color: var(--ink);
+}
+.section-head h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.section-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.col-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.empty-mini {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0;
+  padding: 2px 0;
+}
+.board-add {
+  border: 2px dashed #c4bcdd;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--muted);
   font-family: var(--body);
   font-weight: 700;
   font-size: 13px;
-  border-radius: 999px;
-  padding: 9px 15px;
   cursor: pointer;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-.chip.active {
-  background: var(--ink);
-  color: #fff;
-}
-.chip.new {
-  border: 2px dashed #c4bcdd;
-  background: transparent;
-  color: var(--muted);
+  justify-content: center;
+  min-height: 60px;
 }
 
 .cards {
@@ -728,6 +760,23 @@ header.app-header .signout {
 
   .hero .big {
     font-size: 56px;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .board-col {
+    background: #ffffffa8;
+    border-radius: 18px;
+    padding: 14px;
+  }
+
+  .board-add {
+    min-height: 120px;
   }
 }
 
