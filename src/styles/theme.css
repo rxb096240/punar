@@ -518,10 +518,15 @@ header.app-header .signout {
   display: flex;
   align-items: center;
   gap: 12px;
+  cursor: pointer;
   transition: transform 0.08s ease;
 }
 .item:active {
   transform: scale(0.985);
+}
+.item:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 .item-icon {
   flex-shrink: 0;

@@ -1,5 +1,5 @@
 import type { Todo } from '../lib/types';
-import { CheckIcon, TrashIcon, EditIcon } from './icons';
+import { CheckIcon, TrashIcon } from './icons';
 import { daysUntil, formatDue, urgency } from '../lib/dates';
 
 export function TodoCard({
@@ -18,7 +18,19 @@ export function TodoCard({
   const metaColor = todo.completed ? 'var(--muted)' : u === 'late' ? 'var(--coral)' : u === 'soon' ? 'var(--peach-ink)' : 'var(--muted)';
 
   return (
-    <div className="item" style={{ opacity: todo.completed ? 0.6 : 1 }}>
+    <div
+      className="item"
+      role="button"
+      tabIndex={0}
+      style={{ opacity: todo.completed ? 0.6 : 1 }}
+      onClick={onEdit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onEdit();
+        }
+      }}
+    >
       <div className="item-icon" style={todo.completed ? { background: 'var(--mint)', color: 'var(--mint-ink)' } : undefined}>
         <CheckIcon />
       </div>
@@ -31,13 +43,23 @@ export function TodoCard({
         </div>
       </div>
       <div className="actions">
-        <button className={todo.completed ? '' : 'done'} title={todo.completed ? 'Mark not done' : 'Mark done'} onClick={onToggle}>
+        <button
+          className={todo.completed ? '' : 'done'}
+          title={todo.completed ? 'Mark not done' : 'Mark done'}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle();
+          }}
+        >
           <CheckIcon />
         </button>
-        <button title="Edit" onClick={onEdit}>
-          <EditIcon />
-        </button>
-        <button title="Remove" onClick={onRemove}>
+        <button
+          title="Remove"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
           <TrashIcon />
         </button>
       </div>
