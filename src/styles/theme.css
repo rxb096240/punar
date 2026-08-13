@@ -874,14 +874,24 @@ header.app-header .signout {
   pointer-events: none;
   filter: blur(0.6px);
 }
-.teaser-board {
+.teaser-stack {
   width: 100%;
   max-width: 960px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  filter: grayscale(35%);
+  opacity: 0.7;
+}
+.teaser-hero {
+  margin-bottom: 0;
+  width: 320px;
+}
+.teaser-board {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 22px;
-  filter: grayscale(35%);
-  opacity: 0.7;
 }
 .teaser-col {
   display: flex;
@@ -892,6 +902,10 @@ header.app-header .signout {
   border-radius: 5px;
   background: var(--muted);
   opacity: 0.4;
+}
+.skel-light {
+  background: #fff;
+  opacity: 0.35;
 }
 .skel-title {
   height: 10px;

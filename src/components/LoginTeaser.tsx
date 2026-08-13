@@ -55,42 +55,59 @@ function generateBoard() {
  */
 export function LoginTeaser() {
   const board = useMemo(() => generateBoard(), []);
+  const heroDays = useMemo(() => Math.ceil(Math.random() * 5), []);
+  const heroIcon = useMemo(() => pick(ICON_PATHS), []);
 
   return (
     <div className="login-teaser" aria-hidden="true">
-      <div className="teaser-board">
-        {board.map((col, ci) => (
-          <div className="teaser-col" key={ci}>
-            <div className="section-head">
-              <div className="section-icon">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                  <path d={col.icon} />
-                </svg>
-              </div>
-              <span className="skel skel-title" style={{ width: `${col.titleWidth}%` }} />
-              <span className="section-count">{col.items.length} items</span>
-            </div>
-            <div className="col-cards">
-              {col.items.map((item, ii) => (
-                <div className="item" key={ii}>
-                  <div className="item-icon">
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                      <path d={item.icon} />
-                    </svg>
-                  </div>
-                  <div className="info">
-                    <span className="skel skel-name" style={{ width: `${item.nameWidth}%` }} />
-                    <span className="skel skel-meta" style={{ width: `${item.metaWidth}%` }} />
-                  </div>
-                  <div className={`count-pill ${item.pill.kind}`}>
-                    <div className="n">{item.pill.n}</div>
-                    <div className="u">{item.pill.u}</div>
-                  </div>
+      <div className="teaser-stack">
+        <div className="hero teaser-hero">
+          <p className="label">Up next</p>
+          <p className="big">
+            {heroDays}
+            <span> days</span>
+          </p>
+          <p className="what">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+              <path d={heroIcon} />
+            </svg>
+            <span className="skel skel-light skel-name" style={{ width: '110px' }} />
+          </p>
+        </div>
+        <div className="teaser-board">
+          {board.map((col, ci) => (
+            <div className="teaser-col" key={ci}>
+              <div className="section-head">
+                <div className="section-icon">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d={col.icon} />
+                  </svg>
                 </div>
-              ))}
+                <span className="skel skel-title" style={{ width: `${col.titleWidth}%` }} />
+                <span className="section-count">{col.items.length} items</span>
+              </div>
+              <div className="col-cards">
+                {col.items.map((item, ii) => (
+                  <div className="item" key={ii}>
+                    <div className="item-icon">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                        <path d={item.icon} />
+                      </svg>
+                    </div>
+                    <div className="info">
+                      <span className="skel skel-name" style={{ width: `${item.nameWidth}%` }} />
+                      <span className="skel skel-meta" style={{ width: `${item.metaWidth}%` }} />
+                    </div>
+                    <div className={`count-pill ${item.pill.kind}`}>
+                      <div className="n">{item.pill.n}</div>
+                      <div className="u">{item.pill.u}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );
