@@ -82,7 +82,8 @@ export interface Bill {
   interval_days: number;
   interval_months: number | null;
   next_due_date: string; // date
-  autopay: boolean;
+  payment_method: 'auto' | 'manual';
+  notes: string | null;
   created_by: string;
   created_at: string;
 }

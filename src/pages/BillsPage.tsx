@@ -51,7 +51,6 @@ export function BillsPage() {
         nextDueDate: todayISO(),
         intervalDays: item.interval,
         intervalMonths: item.intervalMonths,
-        autopay: false,
       });
     }
   }
@@ -68,7 +67,7 @@ export function BillsPage() {
         key={b.id}
         icon={icon}
         name={b.name}
-        meta={`${amountLabel}due ${formatDue(b.next_due_date)}${b.autopay ? ' · autopay' : ''}`}
+        meta={`${amountLabel}due ${formatDue(b.next_due_date)}${b.payment_method === 'auto' ? ' · autopay' : ''}`}
         days={b.days}
         urgency={urgency(b.days)}
         doneTitle="Mark paid"

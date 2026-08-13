@@ -13,7 +13,7 @@ const INTERVAL_OPTIONS = [
 ] as const;
 
 function intervalToOption(days: number): string {
-  const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && parseInt(o.value, 10) === days);
+  const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && o.days === days);
   return preset ? preset.value : 'custom';
 }
 
@@ -39,7 +39,6 @@ export function AddBillSheet({
     nextDueDate: string;
     intervalDays: number;
     intervalMonths: number | null;
-    autopay: boolean;
   }) => Promise<void>;
   onUpdate: (
     id: string,
@@ -50,7 +49,8 @@ export function AddBillSheet({
       nextDueDate: string;
       intervalDays: number;
       intervalMonths: number | null;
-      autopay: boolean;
+      paymentMethod: 'auto' | 'manual';
+      notes: string | null;
     }
   ) => Promise<void>;
   onNewGroup: () => void;
@@ -62,7 +62,8 @@ export function AddBillSheet({
   const [nextDueDate, setNextDueDate] = useState(todayISO());
   const [interval, setInterval] = useState('monthly');
   const [customDays, setCustomDays] = useState('');
-  const [autopay, setAutopay] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'auto' | 'manual'>('manual');
+  const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -76,7 +77,8 @@ export function AddBillSheet({
       const opt = intervalToOption(editing.interval_days);
       setInterval(opt);
       setCustomDays(opt === 'custom' ? String(editing.interval_days) : '');
-      setAutopay(editing.autopay);
+      setPaymentMethod(editing.payment_method);
+      setNotes(editing.notes ?? '');
     } else {
       setGroupId(defaultGroupId && groups.some((g) => g.id === defaultGroupId) ? defaultGroupId : groups[0]?.id ?? '');
       setName('');
@@ -84,7 +86,6 @@ export function AddBillSheet({
       setNextDueDate(todayISO());
       setInterval('monthly');
       setCustomDays('');
-      setAutopay(false);
     }
     setError('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,25 +115,31 @@ export function AddBillSheet({
 
     setBusy(true);
     try {
-      const input = {
-        groupId,
-        name: name.trim(),
-        amount: amount.trim() ? parseFloat(amount) : null,
-        nextDueDate,
-        intervalDays,
-        intervalMonths,
-        autopay,
-      };
       if (isEditing && editing) {
-        await onUpdate(editing.id, input);
+        await onUpdate(editing.id, {
+          groupId,
+          name: name.trim(),
+          amount: amount.trim() ? parseFloat(amount) : null,
+          nextDueDate,
+          intervalDays,
+          intervalMonths,
+          paymentMethod,
+          notes: notes.trim() ? notes.trim() : null,
+        });
         onClose();
       } else {
-        await onAdd(input);
+        await onAdd({
+          groupId,
+          name: name.trim(),
+          amount: amount.trim() ? parseFloat(amount) : null,
+          nextDueDate,
+          intervalDays,
+          intervalMonths,
+        });
         setName('');
         setAmount('');
         setNextDueDate(todayISO());
         setCustomDays('');
-        setAutopay(false);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save.');
@@ -185,10 +192,18 @@ export function AddBillSheet({
         </>
       )}
 
-      <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 14, textTransform: 'none', letterSpacing: 0, fontSize: 13 }}>
-        <input type="checkbox" style={{ width: 'auto' }} checked={autopay} onChange={(e) => setAutopay(e.target.checked)} />
-        Autopay
-      </label>
+      {isEditing && (
+        <>
+          <label htmlFor="bPayment">Payment</label>
+          <select id="bPayment" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'auto' | 'manual')}>
+            <option value="auto">Auto</option>
+            <option value="manual">Manual</option>
+          </select>
+
+          <label htmlFor="bNotes">Notes</label>
+          <textarea id="bNotes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any details…" />
+        </>
+      )}
 
       {error && <p className="error">{error}</p>}
       <button className="save" onClick={save} disabled={busy || groups.length === 0}>
