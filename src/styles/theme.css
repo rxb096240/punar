@@ -1,10 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=Sora:wght@400;600;700&display=swap');
 
 :root {
-  --bg: #f0edfb;
-  --ink: #1b1430;
-  --violet: #6c3bff;
-  --violet-soft: #e4dbff;
+  --bg: #eaf0fb;
+  --ink: #101a35;
+  --accent: #2653eb;
+  --accent-soft: #d7e0fb;
   --mint: #b9f0d0;
   --mint-ink: #14563a;
   --peach: #ffd9b8;
@@ -12,7 +12,7 @@
   --coral: #ff5d5d;
   --coral-soft: #ffd6d6;
   --card: #ffffff;
-  --muted: #8b86a0;
+  --muted: #78829c;
   --display: 'Unbounded', system-ui, sans-serif;
   --body: 'Sora', system-ui, sans-serif;
 }
@@ -30,6 +30,18 @@ body {
   min-height: 100vh;
 }
 
+@media (min-width: 700px) {
+  body {
+    background:
+      radial-gradient(640px circle at 10% 6%, rgba(38, 83, 235, 0.12), transparent 60%),
+      radial-gradient(520px circle at 90% 14%, rgba(185, 240, 208, 0.4), transparent 55%),
+      radial-gradient(680px circle at 92% 94%, rgba(255, 217, 184, 0.4), transparent 55%),
+      radial-gradient(520px circle at 4% 92%, rgba(255, 93, 93, 0.09), transparent 55%),
+      var(--bg);
+    background-attachment: fixed;
+  }
+}
+
 button,
 input,
 select {
@@ -43,6 +55,19 @@ select {
   padding: 20px 16px 100px;
 }
 
+@media (min-width: 700px) {
+  .wrap {
+    max-width: 720px;
+    padding-top: 48px;
+  }
+}
+
+@media (min-width: 1040px) {
+  .wrap {
+    max-width: min(94vw, 1440px);
+  }
+}
+
 header.app-header {
   margin-bottom: 18px;
 }
@@ -54,12 +79,12 @@ header.app-header h1 {
   letter-spacing: -0.02em;
 }
 header.app-header h1 .dot {
-  color: var(--violet);
+  color: var(--accent);
 }
 header.app-header p.sub {
   margin: 4px 0 0;
   font-size: 13px;
-  color: #6f6a85;
+  color: #5f6a85;
   font-weight: 600;
 }
 header.app-header .header-row {
@@ -95,7 +120,7 @@ header.app-header .signout {
   width: 160px;
   height: 160px;
   border-radius: 50%;
-  background: var(--violet);
+  background: var(--accent);
   opacity: 0.35;
   filter: blur(10px);
 }
@@ -104,7 +129,7 @@ header.app-header .signout {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: #c9bdf5;
+  color: #a9bdfb;
   margin: 0 0 6px;
   position: relative;
   z-index: 1;
@@ -126,7 +151,7 @@ header.app-header .signout {
   margin: 8px 0 0;
   font-size: 14px;
   font-weight: 600;
-  color: #e8e3fa;
+  color: #eef2ff;
   position: relative;
   z-index: 1;
   display: flex;
@@ -163,40 +188,86 @@ header.app-header .signout {
   color: #fff;
 }
 
-.chips {
+.section-head {
   display: flex;
+  align-items: center;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  margin-bottom: 14px;
-  scrollbar-width: none;
+  margin-bottom: 10px;
 }
-.chips::-webkit-scrollbar {
-  display: none;
-}
-.chip {
+.section-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  background: var(--card);
-  border: 2px solid transparent;
-  color: var(--ink);
+}
+.section-head h3 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 14px;
+  margin: 0;
+  min-width: 0;
+  flex-shrink: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.section-edit {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.section-edit:hover {
+  color: var(--accent);
+}
+.section-count {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+.col-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.empty-mini {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0;
+  padding: 2px 0;
+}
+.board-add {
+  border: 2px dashed #b6c5e8;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--muted);
   font-family: var(--body);
   font-weight: 700;
   font-size: 13px;
-  border-radius: 999px;
-  padding: 9px 15px;
   cursor: pointer;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-.chip.active {
-  background: var(--ink);
-  color: #fff;
-}
-.chip.new {
-  border: 2px dashed #c4bcdd;
-  background: transparent;
-  color: var(--muted);
+  justify-content: center;
+  min-height: 60px;
 }
 
 .cards {
@@ -221,8 +292,8 @@ header.app-header .signout {
   width: 42px;
   height: 42px;
   border-radius: 14px;
-  background: var(--violet-soft);
-  color: var(--violet);
+  background: var(--accent-soft);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -292,7 +363,7 @@ header.app-header .signout {
   justify-content: center;
 }
 .item .actions button.done {
-  color: var(--violet);
+  color: var(--accent);
 }
 
 .empty {
@@ -329,8 +400,8 @@ header.app-header .signout {
   height: 40px;
   border-radius: 13px;
   flex-shrink: 0;
-  background: var(--violet-soft);
-  color: var(--violet);
+  background: var(--accent-soft);
+  color: var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -351,7 +422,7 @@ header.app-header .signout {
   margin-top: 2px;
 }
 .template .t-add {
-  color: var(--violet);
+  color: var(--accent);
   font-weight: 700;
   font-size: 13px;
 }
@@ -361,7 +432,7 @@ header.app-header .signout {
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  background: var(--violet);
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 999px;
@@ -370,7 +441,7 @@ header.app-header .signout {
   font-size: 14px;
   padding: 14px 28px;
   cursor: pointer;
-  box-shadow: 0 8px 24px rgba(108, 59, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(38, 83, 235, 0.4);
   z-index: 20;
   display: flex;
   align-items: center;
@@ -383,7 +454,7 @@ header.app-header .signout {
 .sheet-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(27, 20, 48, 0.5);
+  background: rgba(16, 26, 53, 0.5);
   z-index: 30;
 }
 
@@ -408,6 +479,32 @@ header.app-header .signout {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+@media (min-width: 700px) {
+  .sheet {
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 480px;
+    max-width: 90vw;
+    border-radius: 28px;
+    box-shadow: 0 24px 64px rgba(16, 26, 53, 0.28);
+    animation: sheet-in-desktop 0.18s ease;
+  }
+
+  @keyframes sheet-in-desktop {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -46%);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%);
+    }
   }
 }
 .sheet h2 {
@@ -452,7 +549,7 @@ header.app-header .signout {
 .sheet input:focus,
 .sheet textarea:focus {
   outline: none;
-  border-color: var(--violet);
+  border-color: var(--accent);
 }
 .sheet .save {
   margin-top: 18px;
@@ -480,7 +577,7 @@ header.app-header .signout {
 .sheet .link-btn {
   background: none;
   border: none;
-  color: var(--violet);
+  color: var(--accent);
   font-weight: 700;
   font-size: 13px;
   cursor: pointer;
@@ -505,9 +602,9 @@ header.app-header .signout {
   padding: 0;
 }
 .icon-opt.sel {
-  background: var(--violet-soft);
-  border-color: var(--violet);
-  color: var(--violet);
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .auth-page {
@@ -531,7 +628,7 @@ header.app-header .signout {
   margin: 0 0 4px;
 }
 .auth-card h1 .dot {
-  color: var(--violet);
+  color: var(--accent);
 }
 .auth-card p.sub {
   margin: 0 0 20px;
@@ -561,12 +658,12 @@ header.app-header .signout {
 }
 .auth-card input:focus {
   outline: none;
-  border-color: var(--violet);
+  border-color: var(--accent);
 }
 .auth-card .submit {
   margin-top: 18px;
   width: 100%;
-  background: var(--violet);
+  background: var(--accent);
   color: #fff;
   border: none;
   border-radius: 16px;
@@ -590,7 +687,7 @@ header.app-header .signout {
 .auth-card .switch button {
   background: none;
   border: none;
-  color: var(--violet);
+  color: var(--accent);
   font-weight: 700;
   cursor: pointer;
   padding: 0;
@@ -618,8 +715,8 @@ header.app-header .signout {
   cursor: pointer;
 }
 .onboard-choice button.active {
-  border-color: var(--violet);
-  background: var(--violet-soft);
+  border-color: var(--accent);
+  background: var(--accent-soft);
 }
 .onboard-choice .name {
   font-weight: 700;
@@ -661,6 +758,40 @@ header.app-header .signout {
 }
 .history-row span:first-child {
   color: var(--ink);
+}
+
+@media (min-width: 1040px) {
+  .cards,
+  .templates {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .hero {
+    padding: 38px 44px;
+  }
+
+  .hero .big {
+    font-size: 60px;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    align-items: start;
+  }
+
+  .board-col {
+    background: #ffffffa8;
+    border-radius: 18px;
+    padding: 16px;
+  }
+
+  .board-add {
+    min-height: 120px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

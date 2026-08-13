@@ -49,6 +49,24 @@ export function useRecurringItems(householdId: string | undefined) {
     await refresh();
   }
 
+  async function updateItem(
+    id: string,
+    input: { groupId: string; name: string; lastDate: string; intervalDays: number; intervalMonths?: number | null }
+  ) {
+    const { error } = await supabase
+      .from('recurring_items')
+      .update({
+        group_id: input.groupId,
+        name: input.name,
+        last_date: input.lastDate,
+        interval_days: input.intervalDays,
+        interval_months: input.intervalMonths ?? null,
+      })
+      .eq('id', id);
+    if (error) throw error;
+    await refresh();
+  }
+
   async function markDone(id: string) {
     const { error } = await supabase
       .from('recurring_items')
@@ -64,5 +82,5 @@ export function useRecurringItems(householdId: string | undefined) {
     await refresh();
   }
 
-  return { items, loading, refresh, addItem, markDone, removeItem };
+  return { items, loading, refresh, addItem, updateItem, markDone, removeItem };
 }

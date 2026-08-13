@@ -1,5 +1,5 @@
 import type { IconKey, Urgency } from '../lib/types';
-import { Icon, CheckIcon, TrashIcon } from './icons';
+import { Icon, CheckIcon, TrashIcon, EditIcon } from './icons';
 
 export function DueCard({
   icon,
@@ -9,6 +9,7 @@ export function DueCard({
   urgency,
   doneTitle,
   onDone,
+  onEdit,
   onRemove,
 }: {
   icon: IconKey;
@@ -18,6 +19,7 @@ export function DueCard({
   urgency: Urgency;
   doneTitle: string;
   onDone: () => void;
+  onEdit: () => void;
   onRemove: () => void;
 }) {
   const n = days === 0 ? '!' : Math.abs(days);
@@ -39,6 +41,9 @@ export function DueCard({
       <div className="actions">
         <button className="done" title={doneTitle} onClick={onDone}>
           <CheckIcon />
+        </button>
+        <button title="Edit" onClick={onEdit}>
+          <EditIcon />
         </button>
         <button title="Remove" onClick={onRemove}>
           <TrashIcon />
