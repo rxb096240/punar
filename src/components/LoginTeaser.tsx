@@ -30,7 +30,7 @@ function randomPill(): { kind: PillKind; n: number; u: string } {
 }
 
 function generateBoard() {
-  return COLUMNS.map((col) => ({
+  const board = COLUMNS.map((col) => ({
     titleWidth: col.titleWidth,
     icon: pick(ICON_PATHS),
     items: Array.from({ length: col.items }, () => ({
@@ -40,6 +40,12 @@ function generateBoard() {
       pill: randomPill(),
     })),
   }));
+
+  // Force the first card to read as overdue — urgency color-coding is the
+  // app's headline feature, and random chance alone won't reliably show it.
+  board[0].items[0].pill = { kind: 'late', n: Math.ceil(Math.random() * 3), u: 'late' };
+
+  return board;
 }
 
 /**
