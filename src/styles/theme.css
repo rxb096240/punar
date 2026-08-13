@@ -64,7 +64,7 @@ select {
 
 @media (min-width: 1040px) {
   .wrap {
-    max-width: 960px;
+    max-width: min(94vw, 1440px);
   }
 }
 
@@ -755,24 +755,24 @@ header.app-header .signout {
   }
 
   .hero {
-    padding: 34px 38px;
+    padding: 38px 44px;
   }
 
   .hero .big {
-    font-size: 56px;
+    font-size: 60px;
   }
 
   .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 20px;
     align-items: start;
   }
 
   .board-col {
     background: #ffffffa8;
     border-radius: 18px;
-    padding: 14px;
+    padding: 16px;
   }
 
   .board-add {
