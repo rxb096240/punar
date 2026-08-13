@@ -35,7 +35,7 @@ export function AuthPage() {
     <div className="auth-page">
       <div className="auth-card">
         <Wordmark />
-        <p className="sub">everything recurring, one glance</p>
+        <p className="sub">the shared tracker for bills, chores, and to-dos</p>
 
         <form onSubmit={handleSubmit}>
           <label htmlFor="email">Email</label>

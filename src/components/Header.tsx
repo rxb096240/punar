@@ -31,7 +31,7 @@ export function Header() {
               </p>
             </>
           ) : (
-            <p className="sub">everything recurring, one glance</p>
+            <p className="sub">the shared tracker for bills, chores, and to-dos</p>
           )}
         </div>
         <button className="signout" onClick={() => supabase.auth.signOut()}>
