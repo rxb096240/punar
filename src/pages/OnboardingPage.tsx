@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useHousehold } from '../context/HouseholdContext';
+import { Wordmark } from '../components/Wordmark';
 
 export function OnboardingPage() {
   const { createHousehold, joinHousehold } = useHousehold();
@@ -31,9 +32,7 @@ export function OnboardingPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>
-          Punar<span className="dot">.</span>
-        </h1>
+        <Wordmark />
         <p className="sub">set up your household</p>
 
         <div className="onboard-choice">

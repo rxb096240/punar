@@ -1,6 +1,7 @@
 import { supabase } from '../lib/supabase';
 import { useHousehold } from '../context/HouseholdContext';
 import { HouseholdSwitcher } from './HouseholdSwitcher';
+import { Wordmark } from './Wordmark';
 
 export function Header() {
   const { household, households, selectHousehold, renameHousehold, createHousehold } = useHousehold();
@@ -13,9 +14,7 @@ export function Header() {
     <header className="app-header">
       <div className="header-row">
         <div>
-          <h1>
-            Punar<span className="dot">.</span>
-          </h1>
+          <Wordmark />
           {household ? (
             <>
               <HouseholdSwitcher

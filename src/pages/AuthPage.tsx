@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
+import { Wordmark } from '../components/Wordmark';
 
 export function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -33,9 +34,7 @@ export function AuthPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <h1>
-          Punar<span className="dot">.</span>
-        </h1>
+        <Wordmark />
         <p className="sub">everything recurring, one glance</p>
 
         <form onSubmit={handleSubmit}>

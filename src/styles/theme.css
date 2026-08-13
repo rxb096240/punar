@@ -68,6 +68,17 @@ select {
   }
 }
 
+.wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.wordmark-icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 header.app-header {
   margin-bottom: 18px;
 }
@@ -77,9 +88,6 @@ header.app-header h1 {
   font-size: 26px;
   margin: 0;
   letter-spacing: -0.02em;
-}
-header.app-header h1 .dot {
-  color: var(--accent);
 }
 header.app-header p.sub {
   margin: 4px 0 0;
@@ -854,9 +862,6 @@ header.app-header .signout {
   font-weight: 900;
   font-size: 26px;
   margin: 0 0 4px;
-}
-.auth-card h1 .dot {
-  color: var(--accent);
 }
 .auth-card p.sub {
   margin: 0 0 20px;
