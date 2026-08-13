@@ -26,16 +26,26 @@ const HouseholdContext = createContext<HouseholdContextValue>({
 });
 
 export function HouseholdProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [households, setHouseholds] = useState<Household[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  // Tracks which user the current households/activeId snapshot belongs to, so
+  // a user change is reflected in `loading` immediately (this render), not
+  // only once the refresh effect below gets to run (next render/commit).
+  // Without this, there's a frame where the new user is known but household
+  // data still reflects the previous (often signed-out) user — e.g. briefly
+  // showing the "no household" onboarding screen right after signing in.
+  // `undefined` = nothing has ever been loaded yet.
+  const [loadedForUserId, setLoadedForUserId] = useState<string | null | undefined>(undefined);
 
   async function refresh() {
+    const uid = user?.id ?? null;
     if (!user) {
       setHouseholds([]);
       setActiveId(null);
       setLoading(false);
+      setLoadedForUserId(uid);
       return;
     }
     setLoading(true);
@@ -49,12 +59,14 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
     const lastId = settings?.last_household_id;
     setActiveId(lastId && households.some((h) => h.id === lastId) ? lastId : (households[0]?.id ?? null));
     setLoading(false);
+    setLoadedForUserId(uid);
   }
 
   useEffect(() => {
+    if (authLoading) return;
     refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user?.id]);
+  }, [user?.id, authLoading]);
 
   async function persistActive(id: string) {
     setActiveId(id);
@@ -88,10 +100,23 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
   }
 
   const household = households.find((h) => h.id === activeId) ?? null;
+  // Stay "loading" until the loaded snapshot actually matches the current
+  // user — closes the race even for the render(s) before the effect above
+  // has had a chance to re-run for a newly-changed user.
+  const effectiveLoading = authLoading || loading || loadedForUserId !== (user?.id ?? null);
 
   return (
     <HouseholdContext.Provider
-      value={{ household, households, loading, refresh, createHousehold, joinHousehold, selectHousehold, renameHousehold }}
+      value={{
+        household,
+        households,
+        loading: effectiveLoading,
+        refresh,
+        createHousehold,
+        joinHousehold,
+        selectHousehold,
+        renameHousehold,
+      }}
     >
       {children}
     </HouseholdContext.Provider>
