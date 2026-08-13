@@ -29,7 +29,13 @@ export function RecurringPage() {
     let group = groups.groups.find((g) => g.name === t.group);
     if (!group) group = await groups.createGroup(t.group, t.icon);
     for (const item of t.items) {
-      await recurring.addItem({ groupId: group.id, name: item.name, lastDate: new Date().toISOString().slice(0, 10), intervalDays: item.interval });
+      await recurring.addItem({
+        groupId: group.id,
+        name: item.name,
+        lastDate: new Date().toISOString().slice(0, 10),
+        intervalDays: item.interval,
+        intervalMonths: item.intervalMonths,
+      });
     }
     setActiveGroup(group.id);
   }
