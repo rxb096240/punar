@@ -8,7 +8,7 @@ import { AddGroupSheet } from '../components/AddGroupSheet';
 import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
-import { daysUntilFromLast, urgency, formatDue, advanceDateISO } from '../lib/dates';
+import { daysUntilFromLast, urgency, formatDue, advanceDateISO, todayISO } from '../lib/dates';
 import type { Group, IconKey, RecurringItem } from '../lib/types';
 
 type WithDays = RecurringItem & { days: number };
@@ -45,7 +45,7 @@ export function RecurringPage() {
       await recurring.addItem({
         groupId: group.id,
         name: item.name,
-        lastDate: new Date().toISOString().slice(0, 10),
+        lastDate: todayISO(),
         intervalDays: item.interval,
         intervalMonths: item.intervalMonths,
       });

@@ -9,7 +9,7 @@ import { AddBillSheet } from '../components/AddBillSheet';
 import { PayBillSheet } from '../components/PayBillSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { BILL_TEMPLATES } from '../lib/templates';
-import { daysUntil, urgency, formatDue } from '../lib/dates';
+import { daysUntil, urgency, formatDue, todayISO } from '../lib/dates';
 import type { Bill, Group, IconKey } from '../lib/types';
 
 type WithDays = Bill & { days: number };
@@ -48,7 +48,7 @@ export function BillsPage() {
         groupId: group.id,
         name: item.name,
         amount: null,
-        nextDueDate: new Date().toISOString().slice(0, 10),
+        nextDueDate: todayISO(),
         intervalDays: item.interval,
         intervalMonths: item.intervalMonths,
         autopay: false,
