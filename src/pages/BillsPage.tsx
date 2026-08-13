@@ -50,6 +50,7 @@ export function BillsPage() {
         amount: null,
         nextDueDate: new Date().toISOString().slice(0, 10),
         intervalDays: item.interval,
+        intervalMonths: item.intervalMonths,
         autopay: false,
       });
     }

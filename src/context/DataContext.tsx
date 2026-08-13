@@ -34,7 +34,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       candidates.push({
         icon: (it.group_id && groupIcon.get(it.group_id)) || 'star',
         label: it.name,
-        days: daysUntilFromLast(it.last_date, it.interval_days),
+        days: daysUntilFromLast(it.last_date, it.interval_days, it.interval_months),
       });
     }
     for (const b of bills.bills) {

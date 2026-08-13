@@ -55,6 +55,7 @@ export interface RecurringItem {
   name: string;
   last_date: string; // date
   interval_days: number;
+  interval_months: number | null;
   created_by: string;
   created_at: string;
 }
@@ -79,6 +80,7 @@ export interface Bill {
   name: string;
   amount: number | null;
   interval_days: number;
+  interval_months: number | null;
   next_due_date: string; // date
   autopay: boolean;
   created_by: string;

@@ -5,12 +5,12 @@ import { todayISO } from '../lib/dates';
 import { openDatePicker } from '../lib/openDatePicker';
 
 const INTERVAL_OPTIONS = [
-  { value: '30', label: '30 days' },
-  { value: '90', label: '90 days' },
-  { value: '180', label: '6 months' },
-  { value: '365', label: '1 year' },
-  { value: 'custom', label: 'Custom…' },
-];
+  { value: '30', label: '30 days', days: 30, months: null },
+  { value: '90', label: '90 days', days: 90, months: null },
+  { value: '180', label: '6 months', days: 180, months: 6 },
+  { value: '365', label: '1 year', days: 365, months: 12 },
+  { value: 'custom', label: 'Custom…', days: null, months: null },
+] as const;
 
 function intervalToOption(days: number): string {
   const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && parseInt(o.value, 10) === days);
@@ -32,8 +32,23 @@ export function AddRecurringSheet({
   groups: Group[];
   defaultGroupId: string | null;
   editing?: RecurringItem | null;
-  onAdd: (input: { groupId: string; name: string; lastDate: string; intervalDays: number }) => Promise<void>;
-  onUpdate: (id: string, input: { groupId: string; name: string; lastDate: string; intervalDays: number }) => Promise<void>;
+  onAdd: (input: {
+    groupId: string;
+    name: string;
+    lastDate: string;
+    intervalDays: number;
+    intervalMonths: number | null;
+  }) => Promise<void>;
+  onUpdate: (
+    id: string,
+    input: {
+      groupId: string;
+      name: string;
+      lastDate: string;
+      intervalDays: number;
+      intervalMonths: number | null;
+    }
+  ) => Promise<void>;
   onNewGroup: () => void;
 }) {
   const isEditing = !!editing;
@@ -79,19 +94,21 @@ export function AddRecurringSheet({
       setError('Pick when you last did it.');
       return;
     }
-    const intervalDays = interval === 'custom' ? parseInt(customDays, 10) : parseInt(interval, 10);
+    const selected = INTERVAL_OPTIONS.find((o) => o.value === interval);
+    const intervalDays = interval === 'custom' ? parseInt(customDays, 10) : selected?.days ?? 0;
     if (!intervalDays || intervalDays <= 0) {
       setError('Set how often it repeats.');
       return;
     }
+    const intervalMonths = interval === 'custom' ? null : selected?.months ?? null;
 
     setBusy(true);
     try {
       if (isEditing && editing) {
-        await onUpdate(editing.id, { groupId, name: name.trim(), lastDate, intervalDays });
+        await onUpdate(editing.id, { groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
         onClose();
       } else {
-        await onAdd({ groupId, name: name.trim(), lastDate, intervalDays });
+        await onAdd({ groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
         setName('');
         setLastDate(todayISO());
         setCustomDays('');

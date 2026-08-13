@@ -8,7 +8,7 @@ import { AddGroupSheet } from '../components/AddGroupSheet';
 import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
-import { daysUntilFromLast, urgency, formatDue, addDaysISO } from '../lib/dates';
+import { daysUntilFromLast, urgency, formatDue, advanceDateISO } from '../lib/dates';
 import type { Group, IconKey, RecurringItem } from '../lib/types';
 
 type WithDays = RecurringItem & { days: number };
@@ -26,7 +26,7 @@ export function RecurringPage() {
     const map = new Map<string, WithDays[]>();
     for (const it of recurring.items) {
       const key = it.group_id ?? UNCATEGORIZED;
-      const withDays: WithDays = { ...it, days: daysUntilFromLast(it.last_date, it.interval_days) };
+      const withDays: WithDays = { ...it, days: daysUntilFromLast(it.last_date, it.interval_days, it.interval_months) };
       const arr = map.get(key);
       if (arr) arr.push(withDays);
       else map.set(key, [withDays]);
@@ -47,6 +47,7 @@ export function RecurringPage() {
         name: item.name,
         lastDate: new Date().toISOString().slice(0, 10),
         intervalDays: item.interval,
+        intervalMonths: item.intervalMonths,
       });
     }
   }
@@ -62,7 +63,7 @@ export function RecurringPage() {
         key={it.id}
         icon={icon}
         name={it.name}
-        meta={`due ${formatDue(addDaysISO(it.last_date, it.interval_days))}`}
+        meta={`due ${formatDue(advanceDateISO(it.last_date, it.interval_days, it.interval_months))}`}
         days={it.days}
         urgency={urgency(it.days)}
         doneTitle="Mark done"
