@@ -9,7 +9,7 @@ import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
 import { daysUntilFromLast, urgency, formatDue, addDaysISO } from '../lib/dates';
-import type { IconKey, RecurringItem } from '../lib/types';
+import type { Group, IconKey, RecurringItem } from '../lib/types';
 
 type WithDays = RecurringItem & { days: number };
 
@@ -20,6 +20,7 @@ export function RecurringPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<RecurringItem | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
   const itemsByGroup = useMemo(() => {
     const map = new Map<string, WithDays[]>();
@@ -82,7 +83,7 @@ export function RecurringPage() {
             const items = itemsByGroup.get(g.id) ?? [];
             return (
               <div className="board-col" key={g.id}>
-                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} />
+                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} onEdit={() => setEditingGroup(g)} />
                 {items.length === 0 ? (
                   <p className="empty-mini">nothing here yet</p>
                 ) : (
@@ -105,7 +106,16 @@ export function RecurringPage() {
 
       <Fab onClick={() => setAddOpen(true)} />
 
-      <AddGroupSheet open={groupSheetOpen} onClose={() => setGroupSheetOpen(false)} onCreate={groups.createGroup} />
+      <AddGroupSheet
+        open={groupSheetOpen || !!editingGroup}
+        onClose={() => {
+          setGroupSheetOpen(false);
+          setEditingGroup(null);
+        }}
+        editing={editingGroup}
+        onCreate={groups.createGroup}
+        onUpdate={groups.updateGroup}
+      />
       <AddRecurringSheet
         open={addOpen || !!editingItem}
         onClose={closeSheet}

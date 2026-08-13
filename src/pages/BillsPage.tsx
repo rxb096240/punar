@@ -10,7 +10,7 @@ import { PayBillSheet } from '../components/PayBillSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { BILL_TEMPLATES } from '../lib/templates';
 import { daysUntil, urgency, formatDue } from '../lib/dates';
-import type { Bill, IconKey } from '../lib/types';
+import type { Bill, Group, IconKey } from '../lib/types';
 
 type WithDays = Bill & { days: number };
 
@@ -22,6 +22,7 @@ export function BillsPage() {
   const [editingBill, setEditingBill] = useState<Bill | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
   const [payingBill, setPayingBill] = useState<Bill | null>(null);
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
 
   const billsByGroup = useMemo(() => {
     const map = new Map<string, WithDays[]>();
@@ -87,7 +88,7 @@ export function BillsPage() {
             const items = billsByGroup.get(g.id) ?? [];
             return (
               <div className="board-col" key={g.id}>
-                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} />
+                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} onEdit={() => setEditingGroup(g)} />
                 {items.length === 0 ? (
                   <p className="empty-mini">nothing here yet</p>
                 ) : (
@@ -110,7 +111,16 @@ export function BillsPage() {
 
       <Fab label="add bill" onClick={() => setAddOpen(true)} />
 
-      <AddGroupSheet open={groupSheetOpen} onClose={() => setGroupSheetOpen(false)} onCreate={groups.createGroup} />
+      <AddGroupSheet
+        open={groupSheetOpen || !!editingGroup}
+        onClose={() => {
+          setGroupSheetOpen(false);
+          setEditingGroup(null);
+        }}
+        editing={editingGroup}
+        onCreate={groups.createGroup}
+        onUpdate={groups.updateGroup}
+      />
       <AddBillSheet
         open={addOpen || !!editingBill}
         onClose={closeSheet}
