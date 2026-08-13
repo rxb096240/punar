@@ -4,12 +4,12 @@ import type { Group } from '../lib/types';
 import { todayISO } from '../lib/dates';
 
 const INTERVAL_OPTIONS = [
-  { value: '30', label: 'Monthly' },
-  { value: '90', label: 'Quarterly' },
-  { value: '180', label: '6 months' },
-  { value: '365', label: 'Yearly' },
-  { value: 'custom', label: 'Custom…' },
-];
+  { value: 'monthly', label: 'Monthly', days: 30, months: 1 },
+  { value: 'quarterly', label: 'Quarterly', days: 90, months: 3 },
+  { value: 'semiannual', label: '6 months', days: 180, months: 6 },
+  { value: 'yearly', label: 'Yearly', days: 365, months: 12 },
+  { value: 'custom', label: 'Custom…', days: null, months: null },
+] as const;
 
 export function AddBillSheet({
   open,
@@ -29,6 +29,7 @@ export function AddBillSheet({
     amount: number | null;
     nextDueDate: string;
     intervalDays: number;
+    intervalMonths: number | null;
     autopay: boolean;
   }) => Promise<void>;
   onNewGroup: () => void;
@@ -37,7 +38,7 @@ export function AddBillSheet({
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [nextDueDate, setNextDueDate] = useState(todayISO());
-  const [interval, setInterval] = useState('30');
+  const [interval, setInterval] = useState('monthly');
   const [customDays, setCustomDays] = useState('');
   const [autopay, setAutopay] = useState(false);
   const [error, setError] = useState('');
@@ -64,11 +65,13 @@ export function AddBillSheet({
       setError('Pick the next due date.');
       return;
     }
-    const intervalDays = interval === 'custom' ? parseInt(customDays, 10) : parseInt(interval, 10);
+    const selected = INTERVAL_OPTIONS.find((o) => o.value === interval);
+    const intervalDays = interval === 'custom' ? parseInt(customDays, 10) : selected?.days ?? 0;
     if (!intervalDays || intervalDays <= 0) {
       setError('Set how often it repeats.');
       return;
     }
+    const intervalMonths = interval === 'custom' ? null : selected?.months ?? null;
 
     setBusy(true);
     try {
@@ -78,6 +81,7 @@ export function AddBillSheet({
         amount: amount.trim() ? parseFloat(amount) : null,
         nextDueDate,
         intervalDays,
+        intervalMonths,
         autopay,
       });
       setName('');

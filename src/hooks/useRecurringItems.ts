@@ -32,6 +32,7 @@ export function useRecurringItems(householdId: string | undefined) {
     name: string;
     lastDate: string;
     intervalDays: number;
+    intervalMonths?: number | null;
   }) {
     if (!householdId) throw new Error('No household selected.');
     const { data: userData } = await supabase.auth.getUser();
@@ -41,6 +42,7 @@ export function useRecurringItems(householdId: string | undefined) {
       name: input.name,
       last_date: input.lastDate,
       interval_days: input.intervalDays,
+      interval_months: input.intervalMonths ?? null,
       created_by: userData.user?.id,
     });
     if (error) throw error;

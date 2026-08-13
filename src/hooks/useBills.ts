@@ -33,6 +33,7 @@ export function useBills(householdId: string | undefined) {
     amount: number | null;
     nextDueDate: string;
     intervalDays: number;
+    intervalMonths?: number | null;
     autopay: boolean;
   }) {
     if (!householdId) throw new Error('No household selected.');
@@ -44,6 +45,7 @@ export function useBills(householdId: string | undefined) {
       amount: input.amount,
       next_due_date: input.nextDueDate,
       interval_days: input.intervalDays,
+      interval_months: input.intervalMonths ?? null,
       autopay: input.autopay,
       created_by: userData.user?.id,
     });

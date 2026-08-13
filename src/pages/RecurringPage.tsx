@@ -7,7 +7,7 @@ import { AddGroupSheet } from '../components/AddGroupSheet';
 import { AddRecurringSheet } from '../components/AddRecurringSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
-import { daysUntilFromLast, urgency, formatDue, addDaysISO } from '../lib/dates';
+import { daysUntilFromLast, urgency, formatDue, advanceDateISO } from '../lib/dates';
 
 export function RecurringPage() {
   const { groups, recurring } = useData();
@@ -20,7 +20,7 @@ export function RecurringPage() {
   const visible = useMemo(() => {
     return recurring.items
       .filter((it) => activeGroup === 'All' || it.group_id === activeGroup)
-      .map((it) => ({ ...it, days: daysUntilFromLast(it.last_date, it.interval_days) }))
+      .map((it) => ({ ...it, days: daysUntilFromLast(it.last_date, it.interval_days, it.interval_months) }))
       .sort((a, b) => a.days - b.days);
   }, [recurring.items, activeGroup]);
 
@@ -59,7 +59,7 @@ export function RecurringPage() {
                   key={it.id}
                   icon={group?.icon ?? 'star'}
                   name={it.name}
-                  meta={`${group?.name ?? 'Uncategorized'} · due ${formatDue(addDaysISO(it.last_date, it.interval_days))}`}
+                  meta={`${group?.name ?? 'Uncategorized'} · due ${formatDue(advanceDateISO(it.last_date, it.interval_days, it.interval_months))}`}
                   days={it.days}
                   urgency={urgency(it.days)}
                   doneTitle="Mark done"
