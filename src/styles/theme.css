@@ -924,6 +924,70 @@ header.app-header .signout {
     display: flex;
   }
 }
+
+.login-teaser-mobile {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  filter: blur(0.5px);
+}
+.mob-teaser-top {
+  position: absolute;
+  top: 26px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+.mob-teaser-top .teaser-hero {
+  width: 100%;
+  max-width: 300px;
+  opacity: 0.85;
+}
+.mob-teaser-top .teaser-hero .big {
+  font-size: 28px;
+}
+.mob-teaser-top .teaser-hero .label {
+  font-size: 10px;
+  margin-bottom: 4px;
+}
+.mob-teaser-bottom {
+  position: absolute;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+}
+.mob-items {
+  width: 100%;
+  max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  filter: grayscale(35%);
+  opacity: 0.68;
+}
+.mob-items .item {
+  border-radius: 15px;
+  padding: 9px 12px;
+  box-shadow: 0 6px 16px rgba(16, 26, 53, 0.06);
+}
+.mob-items .item-icon {
+  width: 27px;
+  height: 27px;
+}
+
+@media (min-width: 340px) and (max-width: 1039.98px) {
+  .login-teaser-mobile {
+    display: block;
+  }
+}
+
 .auth-card h1 {
   font-family: var(--display);
   font-weight: 900;
