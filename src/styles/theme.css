@@ -844,18 +844,71 @@ header.app-header .signout {
 }
 
 .auth-page {
+  position: relative;
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
+  overflow: hidden;
 }
 .auth-card {
+  position: relative;
+  z-index: 2;
   background: var(--card);
   border-radius: 28px;
   padding: 28px 24px;
   width: 100%;
   max-width: 380px;
+  box-shadow: 0 20px 50px rgba(16, 26, 53, 0.12);
+}
+
+.login-teaser {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 56px;
+  pointer-events: none;
+  filter: blur(0.6px);
+}
+.teaser-board {
+  width: 100%;
+  max-width: 960px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  filter: grayscale(35%);
+  opacity: 0.7;
+}
+.teaser-col {
+  display: flex;
+  flex-direction: column;
+}
+.skel {
+  display: block;
+  border-radius: 5px;
+  background: var(--muted);
+  opacity: 0.4;
+}
+.skel-title {
+  height: 10px;
+}
+.skel-name {
+  height: 9px;
+}
+.skel-meta {
+  height: 7px;
+  opacity: 0.28;
+  margin-top: 6px;
+}
+
+@media (min-width: 1040px) {
+  .login-teaser {
+    display: flex;
+  }
 }
 .auth-card h1 {
   font-family: var(--display);

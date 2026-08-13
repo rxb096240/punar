@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
 import { Wordmark } from '../components/Wordmark';
+import { LoginTeaser } from '../components/LoginTeaser';
 
 export function AuthPage() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -33,6 +34,7 @@ export function AuthPage() {
 
   return (
     <div className="auth-page">
+      <LoginTeaser />
       <div className="auth-card">
         <Wordmark />
         <p className="sub">the shared tracker for bills, chores, and to-dos</p>
