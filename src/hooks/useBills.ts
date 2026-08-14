@@ -34,7 +34,6 @@ export function useBills(householdId: string | undefined) {
     nextDueDate: string;
     intervalDays: number;
     intervalMonths?: number | null;
-    autopay: boolean;
   }) {
     if (!householdId) throw new Error('No household selected.');
     const { data: userData } = await supabase.auth.getUser();
@@ -46,9 +45,38 @@ export function useBills(householdId: string | undefined) {
       next_due_date: input.nextDueDate,
       interval_days: input.intervalDays,
       interval_months: input.intervalMonths ?? null,
-      autopay: input.autopay,
       created_by: userData.user?.id,
     });
+    if (error) throw error;
+    await refresh();
+  }
+
+  async function updateBill(
+    id: string,
+    input: {
+      groupId: string;
+      name: string;
+      amount: number | null;
+      nextDueDate: string;
+      intervalDays: number;
+      intervalMonths?: number | null;
+      paymentMethod: 'auto' | 'manual';
+      notes: string | null;
+    }
+  ) {
+    const { error } = await supabase
+      .from('bills')
+      .update({
+        group_id: input.groupId,
+        name: input.name,
+        amount: input.amount,
+        next_due_date: input.nextDueDate,
+        interval_days: input.intervalDays,
+        interval_months: input.intervalMonths ?? null,
+        payment_method: input.paymentMethod,
+        notes: input.notes,
+      })
+      .eq('id', id);
     if (error) throw error;
     await refresh();
   }
@@ -69,5 +97,5 @@ export function useBills(householdId: string | undefined) {
     await refresh();
   }
 
-  return { bills, loading, refresh, addBill, payBill, removeBill };
+  return { bills, loading, refresh, addBill, updateBill, payBill, removeBill };
 }

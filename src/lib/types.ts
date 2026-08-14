@@ -1,15 +1,28 @@
 export type IconKey =
   | 'home'
   | 'bill'
-  | 'car'
-  | 'health'
-  | 'pet'
-  | 'plant'
-  | 'tech'
-  | 'card'
-  | 'shield'
   | 'tool'
   | 'cal'
+  | 'tv'
+  | 'wifi'
+  | 'zap'
+  | 'flame'
+  | 'droplet'
+  | 'car'
+  | 'health'
+  | 'dumbbell'
+  | 'card'
+  | 'landmark'
+  | 'pet'
+  | 'baby'
+  | 'users'
+  | 'briefcase'
+  | 'graduationCap'
+  | 'tech'
+  | 'plane'
+  | 'cart'
+  | 'package'
+  | 'shield'
   | 'star';
 
 export interface Household {
@@ -69,7 +82,8 @@ export interface Bill {
   interval_days: number;
   interval_months: number | null;
   next_due_date: string; // date
-  autopay: boolean;
+  payment_method: 'auto' | 'manual';
+  notes: string | null;
   created_by: string;
   created_at: string;
 }

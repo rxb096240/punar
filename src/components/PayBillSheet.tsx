@@ -3,6 +3,7 @@ import { Sheet } from './Sheet';
 import type { Bill } from '../lib/types';
 import { useBillPayments } from '../hooks/useBillPayments';
 import { todayISO, formatDue } from '../lib/dates';
+import { openDatePicker } from '../lib/openDatePicker';
 
 export function PayBillSheet({
   bill,
@@ -53,7 +54,7 @@ export function PayBillSheet({
       <input id="pAmount" type="number" min={0} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 120.00" />
 
       <label htmlFor="pDate">Paid on</label>
-      <input id="pDate" type="date" value={paidDate} onChange={(e) => setPaidDate(e.target.value)} />
+      <input id="pDate" type="date" value={paidDate} onChange={(e) => setPaidDate(e.target.value)} onClick={openDatePicker} />
 
       {error && <p className="error">{error}</p>}
       <button className="save" onClick={save} disabled={busy}>

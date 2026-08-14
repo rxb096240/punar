@@ -10,8 +10,9 @@ Supabase (Postgres + Auth + Row Level Security).
 
 - **Recurring items** — chores/maintenance with a last-done date and a
   repeat interval, grouped into categories with icons.
-- **Bills** — amount, due date, repeat interval, autopay flag; marking a
-  bill paid records a payment in its history and advances the due date.
+- **Bills** — amount, due date, repeat interval, payment method (auto/manual)
+  and notes; marking a bill paid records a payment in its history and
+  advances the due date.
 - **To-dos** — one-off tasks with an optional due date.
 - **Households** — sign up, create or join a household via invite code,
   and everyone in the household sees the same data (enforced by Postgres

@@ -1,13 +1,33 @@
 import type { Urgency } from './types';
 
+function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function toISO(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/**
+ * Parses a "YYYY-MM-DD" string into a local-midnight Date. Never use
+ * `new Date(dateISO)` directly on a date-only string — it parses as UTC
+ * midnight, and reading it back with local getters/setters (or
+ * toLocaleDateString) then shifts the calendar date by a day in any
+ * timezone behind UTC.
+ */
+function parseISO(dateISO: string): Date {
+  const [y, m, d] = dateISO.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toISO(new Date());
 }
 
 export function addDaysISO(dateISO: string, days: number): string {
-  const d = new Date(dateISO);
+  const d = parseISO(dateISO);
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return toISO(d);
 }
 
 /**
@@ -30,10 +50,9 @@ export function advanceDateISO(dateISO: string, intervalDays: number, intervalMo
 
 /** Days between today and a due date (negative = overdue). */
 export function daysUntil(dueISO: string): number {
-  const due = new Date(dueISO);
+  const due = parseISO(dueISO);
   const t = new Date();
   t.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
   return Math.round((due.getTime() - t.getTime()) / 86400000);
 }
 
@@ -46,6 +65,5 @@ export function urgency(days: number): Urgency {
 }
 
 export function formatDue(dueISO: string): string {
-  const due = new Date(dueISO);
-  return due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return parseISO(dueISO).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }

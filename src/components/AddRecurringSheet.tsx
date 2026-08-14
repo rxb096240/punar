@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Sheet } from './Sheet';
-import type { Group } from '../lib/types';
+import type { Group, RecurringItem } from '../lib/types';
 import { todayISO } from '../lib/dates';
+import { openDatePicker } from '../lib/openDatePicker';
 
 const INTERVAL_OPTIONS = [
   { value: '30', label: '30 days', days: 30, months: null },
@@ -11,18 +12,26 @@ const INTERVAL_OPTIONS = [
   { value: 'custom', label: 'Custom…', days: null, months: null },
 ] as const;
 
+function intervalToOption(days: number): string {
+  const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && parseInt(o.value, 10) === days);
+  return preset ? preset.value : 'custom';
+}
+
 export function AddRecurringSheet({
   open,
   onClose,
   groups,
   defaultGroupId,
+  editing,
   onAdd,
+  onUpdate,
   onNewGroup,
 }: {
   open: boolean;
   onClose: () => void;
   groups: Group[];
   defaultGroupId: string | null;
+  editing?: RecurringItem | null;
   onAdd: (input: {
     groupId: string;
     name: string;
@@ -30,8 +39,19 @@ export function AddRecurringSheet({
     intervalDays: number;
     intervalMonths: number | null;
   }) => Promise<void>;
+  onUpdate: (
+    id: string,
+    input: {
+      groupId: string;
+      name: string;
+      lastDate: string;
+      intervalDays: number;
+      intervalMonths: number | null;
+    }
+  ) => Promise<void>;
   onNewGroup: () => void;
 }) {
+  const isEditing = !!editing;
   const [groupId, setGroupId] = useState('');
   const [name, setName] = useState('');
   const [lastDate, setLastDate] = useState(todayISO());
@@ -41,11 +61,24 @@ export function AddRecurringSheet({
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (open) {
+    if (!open) return;
+    if (editing) {
+      setGroupId(editing.group_id ?? '');
+      setName(editing.name);
+      setLastDate(editing.last_date);
+      const opt = intervalToOption(editing.interval_days);
+      setInterval(opt);
+      setCustomDays(opt === 'custom' ? String(editing.interval_days) : '');
+    } else {
       setGroupId(defaultGroupId && groups.some((g) => g.id === defaultGroupId) ? defaultGroupId : groups[0]?.id ?? '');
+      setName('');
+      setLastDate(todayISO());
+      setInterval('90');
+      setCustomDays('');
     }
+    setError('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, editing]);
 
   async function save() {
     setError('');
@@ -71,10 +104,15 @@ export function AddRecurringSheet({
 
     setBusy(true);
     try {
-      await onAdd({ groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
-      setName('');
-      setLastDate(todayISO());
-      setCustomDays('');
+      if (isEditing && editing) {
+        await onUpdate(editing.id, { groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
+        onClose();
+      } else {
+        await onAdd({ groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
+        setName('');
+        setLastDate(todayISO());
+        setCustomDays('');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not save.');
     } finally {
@@ -84,8 +122,8 @@ export function AddRecurringSheet({
 
   return (
     <Sheet open={open} onClose={onClose}>
-      <h2>New item</h2>
-      <p className="hint">group stays selected so you can add a few in a row</p>
+      <h2>{isEditing ? 'Edit item' : 'New item'}</h2>
+      <p className="hint">{isEditing ? 'update the details below' : 'group stays selected so you can add a few in a row'}</p>
 
       <label htmlFor="rGroup">Group</label>
       {groups.length === 0 ? (
@@ -106,7 +144,7 @@ export function AddRecurringSheet({
       <input id="rName" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. AC filter" />
 
       <label htmlFor="rLast">Last done</label>
-      <input id="rLast" type="date" value={lastDate} onChange={(e) => setLastDate(e.target.value)} />
+      <input id="rLast" type="date" value={lastDate} onChange={(e) => setLastDate(e.target.value)} onClick={openDatePicker} />
 
       <label htmlFor="rInterval">Repeats every</label>
       <select id="rInterval" value={interval} onChange={(e) => setInterval(e.target.value)}>
@@ -132,7 +170,7 @@ export function AddRecurringSheet({
 
       {error && <p className="error">{error}</p>}
       <button className="save" onClick={save} disabled={busy || groups.length === 0}>
-        Save it
+        {isEditing ? 'Save changes' : 'Save it'}
       </button>
     </Sheet>
   );

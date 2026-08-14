@@ -9,6 +9,7 @@ export function DueCard({
   urgency,
   doneTitle,
   onDone,
+  onEdit,
   onRemove,
 }: {
   icon: IconKey;
@@ -18,13 +19,25 @@ export function DueCard({
   urgency: Urgency;
   doneTitle: string;
   onDone: () => void;
+  onEdit: () => void;
   onRemove: () => void;
 }) {
   const n = days === 0 ? '!' : Math.abs(days);
   const unit = days < 0 ? 'late' : days === 0 ? 'today' : 'days';
 
   return (
-    <div className="item">
+    <div
+      className="item"
+      role="button"
+      tabIndex={0}
+      onClick={onEdit}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onEdit();
+        }
+      }}
+    >
       <div className="item-icon">
         <Icon name={icon} size={20} />
       </div>
@@ -37,10 +50,23 @@ export function DueCard({
         <div className="u">{unit}</div>
       </div>
       <div className="actions">
-        <button className="done" title={doneTitle} onClick={onDone}>
+        <button
+          className="done"
+          title={doneTitle}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDone();
+          }}
+        >
           <CheckIcon />
         </button>
-        <button title="Remove" onClick={onRemove}>
+        <button
+          title="Remove"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRemove();
+          }}
+        >
           <TrashIcon />
         </button>
       </div>
