@@ -5,15 +5,15 @@ import { todayISO } from '../lib/dates';
 import { openDatePicker } from '../lib/openDatePicker';
 
 const INTERVAL_OPTIONS = [
-  { value: '30', label: '30 days', days: 30, months: null },
-  { value: '90', label: '90 days', days: 90, months: null },
-  { value: '180', label: '6 months', days: 180, months: 6 },
-  { value: '365', label: '1 year', days: 365, months: 12 },
+  { value: 'monthly', label: 'Monthly', days: 30, months: 1 },
+  { value: 'quarterly', label: 'Quarterly', days: 90, months: 3 },
+  { value: 'semiannual', label: '6 months', days: 180, months: 6 },
+  { value: 'yearly', label: 'Yearly', days: 365, months: 12 },
   { value: 'custom', label: 'Custom…', days: null, months: null },
 ] as const;
 
-function intervalToOption(days: number): string {
-  const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && parseInt(o.value, 10) === days);
+function intervalToOption(days: number, months: number | null): string {
+  const preset = INTERVAL_OPTIONS.find((o) => o.value !== 'custom' && o.days === days && o.months === months);
   return preset ? preset.value : 'custom';
 }
 
@@ -35,7 +35,8 @@ export function AddRecurringSheet({
   onAdd: (input: {
     groupId: string;
     name: string;
-    lastDate: string;
+    amount: number | null;
+    nextDueDate: string;
     intervalDays: number;
     intervalMonths: number | null;
   }) => Promise<void>;
@@ -44,9 +45,12 @@ export function AddRecurringSheet({
     input: {
       groupId: string;
       name: string;
-      lastDate: string;
+      amount: number | null;
+      nextDueDate: string;
       intervalDays: number;
       intervalMonths: number | null;
+      paymentMethod: 'auto' | 'manual' | null;
+      notes: string | null;
     }
   ) => Promise<void>;
   onNewGroup: () => void;
@@ -54,9 +58,12 @@ export function AddRecurringSheet({
   const isEditing = !!editing;
   const [groupId, setGroupId] = useState('');
   const [name, setName] = useState('');
-  const [lastDate, setLastDate] = useState(todayISO());
-  const [interval, setInterval] = useState('90');
+  const [amount, setAmount] = useState('');
+  const [nextDueDate, setNextDueDate] = useState(todayISO());
+  const [interval, setInterval] = useState('monthly');
   const [customDays, setCustomDays] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'auto' | 'manual'>('manual');
+  const [notes, setNotes] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -65,15 +72,19 @@ export function AddRecurringSheet({
     if (editing) {
       setGroupId(editing.group_id ?? '');
       setName(editing.name);
-      setLastDate(editing.last_date);
-      const opt = intervalToOption(editing.interval_days);
+      setAmount(editing.amount != null ? String(editing.amount) : '');
+      setNextDueDate(editing.next_due_date);
+      const opt = intervalToOption(editing.interval_days, editing.interval_months);
       setInterval(opt);
       setCustomDays(opt === 'custom' ? String(editing.interval_days) : '');
+      setPaymentMethod(editing.payment_method ?? 'manual');
+      setNotes(editing.notes ?? '');
     } else {
       setGroupId(defaultGroupId && groups.some((g) => g.id === defaultGroupId) ? defaultGroupId : groups[0]?.id ?? '');
       setName('');
-      setLastDate(todayISO());
-      setInterval('90');
+      setAmount('');
+      setNextDueDate(todayISO());
+      setInterval('monthly');
       setCustomDays('');
     }
     setError('');
@@ -87,11 +98,11 @@ export function AddRecurringSheet({
       return;
     }
     if (!name.trim()) {
-      setError('Give the item a name.');
+      setError('Give it a name.');
       return;
     }
-    if (!lastDate) {
-      setError('Pick when you last did it.');
+    if (!nextDueDate) {
+      setError('Pick the next due date.');
       return;
     }
     const selected = INTERVAL_OPTIONS.find((o) => o.value === interval);
@@ -105,12 +116,29 @@ export function AddRecurringSheet({
     setBusy(true);
     try {
       if (isEditing && editing) {
-        await onUpdate(editing.id, { groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
+        await onUpdate(editing.id, {
+          groupId,
+          name: name.trim(),
+          amount: amount.trim() ? parseFloat(amount) : null,
+          nextDueDate,
+          intervalDays,
+          intervalMonths,
+          paymentMethod: amount.trim() ? paymentMethod : null,
+          notes: notes.trim() ? notes.trim() : null,
+        });
         onClose();
       } else {
-        await onAdd({ groupId, name: name.trim(), lastDate, intervalDays, intervalMonths });
+        await onAdd({
+          groupId,
+          name: name.trim(),
+          amount: amount.trim() ? parseFloat(amount) : null,
+          nextDueDate,
+          intervalDays,
+          intervalMonths,
+        });
         setName('');
-        setLastDate(todayISO());
+        setAmount('');
+        setNextDueDate(todayISO());
         setCustomDays('');
       }
     } catch (err) {
@@ -141,10 +169,13 @@ export function AddRecurringSheet({
       )}
 
       <label htmlFor="rName">What is it?</label>
-      <input id="rName" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. AC filter" />
+      <input id="rName" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Electricity, AC filter" />
 
-      <label htmlFor="rLast">Last done</label>
-      <input id="rLast" type="date" value={lastDate} onChange={(e) => setLastDate(e.target.value)} onClick={openDatePicker} />
+      <label htmlFor="rAmount">Amount (optional)</label>
+      <input id="rAmount" type="number" min={0} step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g. 120.00" />
+
+      <label htmlFor="rDue">Next due date</label>
+      <input id="rDue" type="date" value={nextDueDate} onChange={(e) => setNextDueDate(e.target.value)} onClick={openDatePicker} />
 
       <label htmlFor="rInterval">Repeats every</label>
       <select id="rInterval" value={interval} onChange={(e) => setInterval(e.target.value)}>
@@ -165,6 +196,19 @@ export function AddRecurringSheet({
             onChange={(e) => setCustomDays(e.target.value)}
             placeholder="e.g. 45"
           />
+        </>
+      )}
+
+      {isEditing && amount.trim() && (
+        <>
+          <label htmlFor="rPayment">Payment</label>
+          <select id="rPayment" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as 'auto' | 'manual')}>
+            <option value="auto">Auto</option>
+            <option value="manual">Manual</option>
+          </select>
+
+          <label htmlFor="rNotes">Notes</label>
+          <textarea id="rNotes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any details…" />
         </>
       )}
 

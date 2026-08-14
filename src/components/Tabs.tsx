@@ -6,9 +6,6 @@ export function Tabs() {
       <NavLink to="/recurring" className={({ isActive }) => (isActive ? 'active' : '')}>
         Recurring
       </NavLink>
-      <NavLink to="/bills" className={({ isActive }) => (isActive ? 'active' : '')}>
-        Bills
-      </NavLink>
       <NavLink to="/todos" className={({ isActive }) => (isActive ? 'active' : '')}>
         To-dos
       </NavLink>

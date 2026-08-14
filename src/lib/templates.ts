@@ -33,13 +33,6 @@ export const RECURRING_TEMPLATES: {
       { name: 'Eye exam', interval: 365, intervalMonths: 12 },
     ],
   },
-];
-
-export const BILL_TEMPLATES: {
-  group: string;
-  icon: IconKey;
-  items: { name: string; interval: number; intervalMonths: number | null }[];
-}[] = [
   {
     group: 'Bills',
     icon: 'bill',

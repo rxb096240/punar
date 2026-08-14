@@ -5,7 +5,6 @@ import { AuthPage } from './pages/AuthPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { AppShell } from './pages/AppShell';
 import { RecurringPage } from './pages/RecurringPage';
-import { BillsPage } from './pages/BillsPage';
 import { TodosPage } from './pages/TodosPage';
 import './styles/theme.css';
 
@@ -22,7 +21,6 @@ function Gate() {
     <Routes>
       <Route element={<AppShell />}>
         <Route path="/recurring" element={<RecurringPage />} />
-        <Route path="/bills" element={<BillsPage />} />
         <Route path="/todos" element={<TodosPage />} />
         <Route path="*" element={<Navigate to="/recurring" replace />} />
       </Route>

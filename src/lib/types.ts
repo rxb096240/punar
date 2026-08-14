@@ -53,9 +53,12 @@ export interface RecurringItem {
   household_id: string;
   group_id: string | null;
   name: string;
-  last_date: string; // date
+  next_due_date: string; // date
   interval_days: number;
   interval_months: number | null;
+  amount: number | null;
+  payment_method: 'auto' | 'manual' | null;
+  notes: string | null;
   created_by: string;
   created_at: string;
 }
@@ -70,31 +73,6 @@ export interface Todo {
   completed_at: string | null;
   assigned_to: string | null;
   created_by: string;
-  created_at: string;
-}
-
-export interface Bill {
-  id: string;
-  household_id: string;
-  group_id: string | null;
-  name: string;
-  amount: number | null;
-  interval_days: number;
-  interval_months: number | null;
-  next_due_date: string; // date
-  payment_method: 'auto' | 'manual';
-  notes: string | null;
-  created_by: string;
-  created_at: string;
-}
-
-export interface BillPayment {
-  id: string;
-  bill_id: string;
-  household_id: string;
-  amount_paid: number | null;
-  paid_date: string; // date
-  paid_by: string;
   created_at: string;
 }
 
