@@ -12,6 +12,28 @@
 -- Payment history (bill_payments / pay_bill()) is dropped — nothing reads
 -- or writes it going forward.
 
+-- Defensive: make sure bills has the payment_method/notes columns from
+-- migration 0006, in case this project never had that one applied.
+do $$
+begin
+  if not exists (
+    select 1 from information_schema.columns
+    where table_schema = 'punar' and table_name = 'bills' and column_name = 'payment_method'
+  ) then
+    alter table punar.bills
+      add column payment_method text not null default 'manual' check (payment_method in ('auto', 'manual'));
+    alter table punar.bills add column notes text;
+
+    if exists (
+      select 1 from information_schema.columns
+      where table_schema = 'punar' and table_name = 'bills' and column_name = 'autopay'
+    ) then
+      update punar.bills set payment_method = case when autopay then 'auto' else 'manual' end;
+      alter table punar.bills drop column autopay;
+    end if;
+  end if;
+end $$;
+
 alter table punar.recurring_items
   add column next_due_date date,
   add column amount numeric(10, 2),
