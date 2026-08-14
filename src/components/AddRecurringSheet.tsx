@@ -206,7 +206,11 @@ export function AddRecurringSheet({
             <option value="auto">Auto</option>
             <option value="manual">Manual</option>
           </select>
+        </>
+      )}
 
+      {isEditing && (
+        <>
           <label htmlFor="rNotes">Notes</label>
           <textarea id="rNotes" value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Any details…" />
         </>
