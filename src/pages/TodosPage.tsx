@@ -4,10 +4,12 @@ import { TodoCard } from '../components/TodoCard';
 import { Fab } from '../components/Fab';
 import { AddTodoSheet } from '../components/AddTodoSheet';
 import { daysUntil } from '../lib/dates';
+import type { Todo } from '../lib/types';
 
 export function TodosPage() {
   const { todos } = useData();
   const [addOpen, setAddOpen] = useState(false);
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const { active, done } = useMemo(() => {
     const active = todos.todos
@@ -21,6 +23,11 @@ export function TodosPage() {
     return { active, done };
   }, [todos.todos]);
 
+  function closeSheet() {
+    setAddOpen(false);
+    setEditingTodo(null);
+  }
+
   return (
     <>
       {todos.todos.length === 0 ? (
@@ -30,7 +37,13 @@ export function TodosPage() {
       ) : (
         <div className="cards">
           {active.map((t) => (
-            <TodoCard key={t.id} todo={t} onToggle={() => todos.toggleTodo(t.id, true)} onRemove={() => todos.removeTodo(t.id)} />
+            <TodoCard
+              key={t.id}
+              todo={t}
+              onToggle={() => todos.toggleTodo(t.id, true)}
+              onEdit={() => setEditingTodo(t)}
+              onRemove={() => todos.removeTodo(t.id)}
+            />
           ))}
           {active.length === 0 && (
             <div className="empty">
@@ -38,13 +51,25 @@ export function TodosPage() {
             </div>
           )}
           {done.map((t) => (
-            <TodoCard key={t.id} todo={t} onToggle={() => todos.toggleTodo(t.id, false)} onRemove={() => todos.removeTodo(t.id)} />
+            <TodoCard
+              key={t.id}
+              todo={t}
+              onToggle={() => todos.toggleTodo(t.id, false)}
+              onEdit={() => setEditingTodo(t)}
+              onRemove={() => todos.removeTodo(t.id)}
+            />
           ))}
         </div>
       )}
 
       <Fab label="add to-do" onClick={() => setAddOpen(true)} />
-      <AddTodoSheet open={addOpen} onClose={() => setAddOpen(false)} onAdd={todos.addTodo} />
+      <AddTodoSheet
+        open={addOpen || !!editingTodo}
+        onClose={closeSheet}
+        editing={editingTodo}
+        onAdd={todos.addTodo}
+        onUpdate={todos.updateTodo}
+      />
     </>
   );
 }

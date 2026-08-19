@@ -1,13 +1,33 @@
 import type { Urgency } from './types';
 
+function pad2(n: number): string {
+  return String(n).padStart(2, '0');
+}
+
+function toISO(d: Date): string {
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+/**
+ * Parses a "YYYY-MM-DD" string into a local-midnight Date. Never use
+ * `new Date(dateISO)` directly on a date-only string — it parses as UTC
+ * midnight, and reading it back with local getters/setters (or
+ * toLocaleDateString) then shifts the calendar date by a day in any
+ * timezone behind UTC.
+ */
+function parseISO(dateISO: string): Date {
+  const [y, m, d] = dateISO.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
 export function todayISO(): string {
-  return new Date().toISOString().slice(0, 10);
+  return toISO(new Date());
 }
 
 export function addDaysISO(dateISO: string, days: number): string {
-  const d = new Date(dateISO);
+  const d = parseISO(dateISO);
   d.setDate(d.getDate() + days);
-  return d.toISOString().slice(0, 10);
+  return toISO(d);
 }
 
 /**
@@ -17,10 +37,10 @@ export function addDaysISO(dateISO: string, days: number): string {
  */
 export function addCalendarMonthsISO(dateISO: string, months: number): string {
   const [y, m, day] = dateISO.split('-').map(Number);
-  const targetFirst = new Date(Date.UTC(y, m - 1 + months, 1));
-  const lastDayOfTarget = new Date(Date.UTC(targetFirst.getUTCFullYear(), targetFirst.getUTCMonth() + 1, 0)).getUTCDate();
-  targetFirst.setUTCDate(Math.min(day, lastDayOfTarget));
-  return targetFirst.toISOString().slice(0, 10);
+  const targetFirst = new Date(y, m - 1 + months, 1);
+  const lastDayOfTarget = new Date(targetFirst.getFullYear(), targetFirst.getMonth() + 1, 0).getDate();
+  targetFirst.setDate(Math.min(day, lastDayOfTarget));
+  return toISO(targetFirst);
 }
 
 /** Advances a date by a bill/recurring item's cadence, preferring calendar months when set. */
@@ -30,10 +50,9 @@ export function advanceDateISO(dateISO: string, intervalDays: number, intervalMo
 
 /** Days between today and a due date (negative = overdue). */
 export function daysUntil(dueISO: string): number {
-  const due = new Date(dueISO);
+  const due = parseISO(dueISO);
   const t = new Date();
   t.setHours(0, 0, 0, 0);
-  due.setHours(0, 0, 0, 0);
   return Math.round((due.getTime() - t.getTime()) / 86400000);
 }
 
@@ -46,6 +65,5 @@ export function urgency(days: number): Urgency {
 }
 
 export function formatDue(dueISO: string): string {
-  const due = new Date(dueISO);
-  return due.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return parseISO(dueISO).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 }

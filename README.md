@@ -1,23 +1,23 @@
 # Punar
 
-A household tracker for recurring chores/maintenance, bills (with payment
-history), and general to-dos — shared across a household via Supabase.
+A household tracker for recurring items — chores/maintenance and bills
+alike — plus general to-dos, shared across a household via Supabase.
 
 Built from a static HTML/CSS/JS mockup, now a proper React app backed by
 Supabase (Postgres + Auth + Row Level Security).
 
 ## Features
 
-- **Recurring items** — chores/maintenance with a last-done date and a
-  repeat interval, grouped into categories with icons.
-- **Bills** — amount, due date, repeat interval, autopay flag; marking a
-  bill paid records a payment in its history and advances the due date.
+- **Recurring items** — anything with a due date and a repeat interval,
+  grouped into categories with icons. An optional amount, payment method
+  (auto/manual), and notes cover the bill-like ones; plain chores just
+  leave those blank. Marking an item done/paid advances its due date.
 - **To-dos** — one-off tasks with an optional due date.
 - **Households** — sign up, create or join a household via invite code,
   and everyone in the household sees the same data (enforced by Postgres
   Row Level Security, not just the client).
-- Every new household is automatically seeded with a **Utilities** bill
-  group (Electricity, Atmos Gas, Water + Trash, Internet, Cable).
+- Every new household is automatically seeded with a **Utilities** group
+  (Electricity, Atmos Gas, Water + Trash, Internet, Cable).
 
 ## Stack
 
@@ -35,9 +35,9 @@ it's safe to run this in a Supabase project that already hosts another app
 
 1. Pick a [Supabase](https://supabase.com) project (new or existing).
 2. In the Supabase SQL editor, run the migrations in `supabase/migrations/`
-   in order (`0001_init.sql`, then `0002_seed_utilities.sql`). Together
-   they create the `punar` schema, all its tables, RLS policies, and the
-   RPCs the app calls (`create_household`, `join_household`, `pay_bill`).
+   in order. Together they create the `punar` schema, all its tables, RLS
+   policies, and the RPCs the app calls (`create_household`,
+   `join_household`).
 3. Go to **Project Settings → API → Data API** and add `punar` to
    **Exposed schemas** (it only exposes `public` by default — without this
    step the app can't see any of its tables).

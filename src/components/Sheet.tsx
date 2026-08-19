@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { CloseIcon } from './icons';
 
 export function Sheet({
   open,
@@ -13,7 +14,12 @@ export function Sheet({
   return (
     <>
       <div className="sheet-backdrop" onClick={onClose} />
-      <div className="sheet">{children}</div>
+      <div className="sheet">
+        <button type="button" className="sheet-close" onClick={onClose} aria-label="Close">
+          <CloseIcon />
+        </button>
+        {children}
+      </div>
     </>
   );
 }
