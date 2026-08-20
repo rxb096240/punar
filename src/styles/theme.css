@@ -825,6 +825,32 @@ header.app-header .signout {
   font-size: 14px;
   color: var(--ink);
 }
+.sheet .field-row {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+}
+.sheet .field-row select {
+  flex: 1;
+  min-width: 0;
+  width: auto;
+}
+.field-add-btn {
+  flex-shrink: 0;
+  width: 44px;
+  border: none;
+  border-radius: 14px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.field-add-btn:hover {
+  background: var(--accent);
+  color: #fff;
+}
 .sheet textarea {
   resize: vertical;
   min-height: 70px;

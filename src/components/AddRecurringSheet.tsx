@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Sheet } from './Sheet';
+import { PlusIcon } from './icons';
 import type { Group, RecurringItem } from '../lib/types';
 import { todayISO } from '../lib/dates';
 import { openDatePicker } from '../lib/openDatePicker';
@@ -91,6 +92,15 @@ export function AddRecurringSheet({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, editing]);
 
+  // Adopts a newly-created group as the selection (the only time this prop
+  // changes while the sheet stays open — via the "+" next to the dropdown
+  // below). Deliberately not a dependency of the effect above, which
+  // otherwise keeps whatever group the person already has selected.
+  useEffect(() => {
+    if (open && defaultGroupId) setGroupId(defaultGroupId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultGroupId]);
+
   async function save() {
     setError('');
     if (!groupId) {
@@ -159,13 +169,18 @@ export function AddRecurringSheet({
           + create a group first
         </button>
       ) : (
-        <select id="rGroup" value={groupId} onChange={(e) => setGroupId(e.target.value)}>
-          {groups.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-            </option>
-          ))}
-        </select>
+        <div className="field-row">
+          <select id="rGroup" value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id}>
+                {g.name}
+              </option>
+            ))}
+          </select>
+          <button type="button" className="field-add-btn" onClick={onNewGroup} title="Add category" aria-label="Add category">
+            <PlusIcon />
+          </button>
+        </div>
       )}
 
       <label htmlFor="rName">What is it?</label>

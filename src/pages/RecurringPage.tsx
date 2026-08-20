@@ -56,6 +56,7 @@ export function RecurringPage() {
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
   const [payingItem, setPayingItem] = useState<RecurringItem | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  const itemSheetOpen = addOpen || !!editingItem;
 
   function openAddItem(groupId: string | null) {
     setAddGroupId(groupId);
@@ -172,6 +173,18 @@ export function RecurringPage() {
 
       <Fab onClick={() => openAddItem(null)} />
 
+      <AddRecurringSheet
+        open={itemSheetOpen}
+        onClose={closeSheet}
+        groups={groups.groups}
+        defaultGroupId={addGroupId}
+        editing={editingItem}
+        onAdd={recurring.addItem}
+        onUpdate={recurring.updateItem}
+        onNewGroup={() => setGroupSheetOpen(true)}
+      />
+      {/* Rendered after AddRecurringSheet so it stacks visually on top when
+          both are open (opened via the "+" next to the group dropdown). */}
       <AddGroupSheet
         open={groupSheetOpen || !!editingGroup}
         onClose={() => {
@@ -179,24 +192,15 @@ export function RecurringPage() {
           setEditingGroup(null);
         }}
         editing={editingGroup}
-        onCreate={groups.createGroup}
+        onCreate={async (name, icon) => {
+          const g = await groups.createGroup(name, icon);
+          if (itemSheetOpen) setAddGroupId(g.id);
+          return g;
+        }}
         onUpdate={groups.updateGroup}
         onDelete={async (id) => {
           await groups.removeGroup(id);
           await recurring.refresh();
-        }}
-      />
-      <AddRecurringSheet
-        open={addOpen || !!editingItem}
-        onClose={closeSheet}
-        groups={groups.groups}
-        defaultGroupId={addGroupId}
-        editing={editingItem}
-        onAdd={recurring.addItem}
-        onUpdate={recurring.updateItem}
-        onNewGroup={() => {
-          setAddOpen(false);
-          setGroupSheetOpen(true);
         }}
       />
       <CompleteItemSheet item={payingItem} onClose={() => setPayingItem(null)} onComplete={recurring.completeItem} />
