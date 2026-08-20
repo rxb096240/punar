@@ -17,7 +17,7 @@ Supabase (Postgres + Auth + Row Level Security).
   and everyone in the household sees the same data (enforced by Postgres
   Row Level Security, not just the client).
 - Every new household is automatically seeded with a **Utilities** group
-  (Electricity, Atmos Gas, Water + Trash, Internet, Cable).
+  (Electricity, Gas, Water + Trash, Internet, Cable).
 
 ## Stack
 
