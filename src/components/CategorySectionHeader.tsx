@@ -1,16 +1,18 @@
 import type { IconKey } from '../lib/types';
-import { Icon } from './icons';
+import { Icon, PlusIcon } from './icons';
 
 export function CategorySectionHeader({
   icon,
   name,
   count,
   onEdit,
+  onAdd,
 }: {
   icon: IconKey;
   name: string;
   count: number;
   onEdit?: () => void;
+  onAdd?: () => void;
 }) {
   return (
     <div className="section-head">
@@ -34,6 +36,11 @@ export function CategorySectionHeader({
         </h3>
       ) : (
         <h3>{name}</h3>
+      )}
+      {onAdd && (
+        <button type="button" className="section-add" onClick={onAdd} title="Add item to this category" aria-label="Add item to this category">
+          <PlusIcon />
+        </button>
       )}
       <span className="section-count">
         {count} item{count === 1 ? '' : 's'}

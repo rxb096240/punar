@@ -25,7 +25,7 @@ const EMPTY_H = 24;
 const ADD_TILE_H = 76;
 
 type BoardBlock =
-  | { kind: 'group'; key: string; icon: IconKey; name: string; items: WithDays[]; onEdit?: () => void }
+  | { kind: 'group'; key: string; icon: IconKey; name: string; items: WithDays[]; onEdit?: () => void; onAdd?: () => void }
   | { kind: 'add' };
 
 function blockHeight(block: BoardBlock): number {
@@ -51,10 +51,16 @@ function layoutColumns(blocks: BoardBlock[], columnCount: number): BoardBlock[][
 export function RecurringPage() {
   const { groups, recurring } = useData();
   const [addOpen, setAddOpen] = useState(false);
+  const [addGroupId, setAddGroupId] = useState<string | null>(null);
   const [editingItem, setEditingItem] = useState<RecurringItem | null>(null);
   const [groupSheetOpen, setGroupSheetOpen] = useState(false);
   const [payingItem, setPayingItem] = useState<RecurringItem | null>(null);
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+
+  function openAddItem(groupId: string | null) {
+    setAddGroupId(groupId);
+    setAddOpen(true);
+  }
 
   const itemsByGroup = useMemo(() => {
     const map = new Map<string, WithDays[]>();
@@ -80,6 +86,7 @@ export function RecurringPage() {
       name: g.name,
       items: itemsByGroup.get(g.id) ?? [],
       onEdit: () => setEditingGroup(g),
+      onAdd: () => openAddItem(g.id),
     }));
     if (uncategorized.length > 0) {
       blocks.push({ kind: 'group', key: UNCATEGORIZED, icon: 'star', name: 'Uncategorized', items: uncategorized });
@@ -105,6 +112,7 @@ export function RecurringPage() {
 
   function closeSheet() {
     setAddOpen(false);
+    setAddGroupId(null);
     setEditingItem(null);
   }
 
@@ -142,7 +150,13 @@ export function RecurringPage() {
                   <AddCategoryTile key="add" onClick={() => setGroupSheetOpen(true)} />
                 ) : (
                   <div className="board-col" key={block.key}>
-                    <CategorySectionHeader icon={block.icon} name={block.name} count={block.items.length} onEdit={block.onEdit} />
+                    <CategorySectionHeader
+                      icon={block.icon}
+                      name={block.name}
+                      count={block.items.length}
+                      onEdit={block.onEdit}
+                      onAdd={block.onAdd}
+                    />
                     {block.items.length === 0 ? (
                       <p className="empty-mini">nothing here yet</p>
                     ) : (
@@ -156,7 +170,7 @@ export function RecurringPage() {
         </div>
       )}
 
-      <Fab onClick={() => setAddOpen(true)} />
+      <Fab onClick={() => openAddItem(null)} />
 
       <AddGroupSheet
         open={groupSheetOpen || !!editingGroup}
@@ -176,7 +190,7 @@ export function RecurringPage() {
         open={addOpen || !!editingItem}
         onClose={closeSheet}
         groups={groups.groups}
-        defaultGroupId={null}
+        defaultGroupId={addGroupId}
         editing={editingItem}
         onAdd={recurring.addItem}
         onUpdate={recurring.updateItem}

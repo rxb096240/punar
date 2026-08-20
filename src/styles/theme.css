@@ -461,6 +461,19 @@ header.app-header .signout {
   color: var(--accent);
   outline: none;
 }
+.section-add {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+.section-add:hover {
+  color: var(--accent);
+}
 .section-count {
   font-size: 11px;
   color: var(--muted);
