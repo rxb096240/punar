@@ -1165,10 +1165,15 @@ header.app-header .signout {
   }
 
   .board {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    align-items: start;
+    display: block;
+    column-count: 3;
+    column-gap: 20px;
+  }
+
+  .board-col,
+  .board-add {
+    break-inside: avoid;
+    margin-bottom: 20px;
   }
 
   .board-col {
