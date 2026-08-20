@@ -80,7 +80,10 @@ export function RecurringPage() {
   return (
     <>
       {recurring.items.length === 0 ? (
-        <TemplatesGrid templates={RECURRING_TEMPLATES} onUse={useTemplate} emptyHint="start with a set, or add your own" />
+        <>
+          <TemplatesGrid templates={RECURRING_TEMPLATES} onUse={useTemplate} emptyHint="start with a set, or add your own" />
+          <AddCategoryTile onClick={() => setGroupSheetOpen(true)} />
+        </>
       ) : (
         <div className="board">
           {groups.groups.map((g) => {

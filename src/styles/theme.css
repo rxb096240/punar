@@ -505,6 +505,9 @@ header.app-header .signout {
   justify-content: center;
   min-height: 60px;
 }
+.templates + .board-add {
+  margin-top: 16px;
+}
 
 .cards {
   display: flex;
