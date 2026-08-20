@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import type { RecurringItem } from '../lib/types';
-import { advanceDateISO, todayISO } from '../lib/dates';
+import { advanceDateISO, catchUpDueDate, todayISO } from '../lib/dates';
 
 export function useRecurringItems(householdId: string | undefined) {
   const [items, setItems] = useState<RecurringItem[]>([]);
@@ -19,7 +19,26 @@ export function useRecurringItems(householdId: string | undefined) {
       .select('*')
       .eq('household_id', householdId)
       .order('created_at', { ascending: true });
-    setItems(data ?? []);
+    const fetched = data ?? [];
+
+    // Autopay items don't wait on a manual "mark paid" — if one fell
+    // behind (app not opened in a while), roll it forward to the next
+    // upcoming due date now rather than showing it stuck in the past.
+    const today = todayISO();
+    const overdueAutopay = fetched.filter((it) => it.payment_method === 'auto' && it.next_due_date < today);
+    if (overdueAutopay.length > 0) {
+      const updates = overdueAutopay.map((it) => ({
+        id: it.id,
+        nextDueDate: catchUpDueDate(it.next_due_date, it.interval_days, it.interval_months),
+      }));
+      await Promise.all(
+        updates.map((u) => supabase.from('recurring_items').update({ next_due_date: u.nextDueDate }).eq('id', u.id))
+      );
+      const byId = new Map(updates.map((u) => [u.id, u.nextDueDate]));
+      setItems(fetched.map((it) => (byId.has(it.id) ? { ...it, next_due_date: byId.get(it.id)! } : it)));
+    } else {
+      setItems(fetched);
+    }
     setLoading(false);
   }, [householdId]);
 

@@ -48,6 +48,16 @@ export function advanceDateISO(dateISO: string, intervalDays: number, intervalMo
   return intervalMonths != null ? addCalendarMonthsISO(dateISO, intervalMonths) : addDaysISO(dateISO, intervalDays);
 }
 
+/** Repeatedly advances a past-due date by its cadence until it's today or later. */
+export function catchUpDueDate(dueISO: string, intervalDays: number, intervalMonths: number | null): string {
+  const today = todayISO();
+  let due = dueISO;
+  while (due < today) {
+    due = advanceDateISO(due, intervalDays, intervalMonths);
+  }
+  return due;
+}
+
 /** Days between today and a due date (negative = overdue). */
 export function daysUntil(dueISO: string): number {
   const due = parseISO(dueISO);
