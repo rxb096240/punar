@@ -10,11 +10,43 @@ import { CompleteItemSheet } from '../components/CompleteItemSheet';
 import { TemplatesGrid } from '../components/TemplatesGrid';
 import { RECURRING_TEMPLATES } from '../lib/templates';
 import { daysUntil, urgency, formatDue, todayISO } from '../lib/dates';
+import { useResponsiveColumns } from '../hooks/useResponsiveColumns';
 import type { Group, IconKey, RecurringItem } from '../lib/types';
 
 type WithDays = RecurringItem & { days: number };
 
 const UNCATEGORIZED = '__uncategorized';
+
+// Rough per-block heights (px) used only to pick a balanced column, not for layout.
+const HEADER_H = 40;
+const PADDING_H = 32;
+const ITEM_H = 56;
+const EMPTY_H = 24;
+const ADD_TILE_H = 76;
+
+type BoardBlock =
+  | { kind: 'group'; key: string; icon: IconKey; name: string; items: WithDays[]; onEdit?: () => void }
+  | { kind: 'add' };
+
+function blockHeight(block: BoardBlock): number {
+  if (block.kind === 'add') return ADD_TILE_H;
+  return HEADER_H + PADDING_H + (block.items.length ? block.items.length * ITEM_H : EMPTY_H);
+}
+
+/** Distributes board blocks across columns, always appending to the currently-shortest one. */
+function layoutColumns(blocks: BoardBlock[], columnCount: number): BoardBlock[][] {
+  const columns: BoardBlock[][] = Array.from({ length: columnCount }, () => []);
+  const heights = new Array(columnCount).fill(0);
+  for (const block of blocks) {
+    let shortest = 0;
+    for (let i = 1; i < columnCount; i++) {
+      if (heights[i] < heights[shortest]) shortest = i;
+    }
+    columns[shortest].push(block);
+    heights[shortest] += blockHeight(block);
+  }
+  return columns;
+}
 
 export function RecurringPage() {
   const { groups, recurring } = useData();
@@ -37,7 +69,24 @@ export function RecurringPage() {
     return map;
   }, [recurring.items]);
 
-  const uncategorized = itemsByGroup.get(UNCATEGORIZED) ?? [];
+  const uncategorized = useMemo(() => itemsByGroup.get(UNCATEGORIZED) ?? [], [itemsByGroup]);
+  const columnCount = useResponsiveColumns();
+
+  const boardColumns = useMemo(() => {
+    const blocks: BoardBlock[] = groups.groups.map((g) => ({
+      kind: 'group',
+      key: g.id,
+      icon: g.icon,
+      name: g.name,
+      items: itemsByGroup.get(g.id) ?? [],
+      onEdit: () => setEditingGroup(g),
+    }));
+    if (uncategorized.length > 0) {
+      blocks.push({ kind: 'group', key: UNCATEGORIZED, icon: 'star', name: 'Uncategorized', items: uncategorized });
+    }
+    blocks.push({ kind: 'add' });
+    return layoutColumns(blocks, columnCount);
+  }, [groups.groups, itemsByGroup, uncategorized, columnCount]);
 
   async function useTemplate(index: number) {
     const t = RECURRING_TEMPLATES[index];
@@ -86,28 +135,24 @@ export function RecurringPage() {
         </>
       ) : (
         <div className="board">
-          {groups.groups.map((g) => {
-            const items = itemsByGroup.get(g.id) ?? [];
-            return (
-              <div className="board-col" key={g.id}>
-                <CategorySectionHeader icon={g.icon} name={g.name} count={items.length} onEdit={() => setEditingGroup(g)} />
-                {items.length === 0 ? (
-                  <p className="empty-mini">nothing here yet</p>
+          {boardColumns.map((column, i) => (
+            <div className="board-column" key={i}>
+              {column.map((block) =>
+                block.kind === 'add' ? (
+                  <AddCategoryTile key="add" onClick={() => setGroupSheetOpen(true)} />
                 ) : (
-                  <div className="col-cards">{items.map((it) => renderCard(it, g.icon))}</div>
-                )}
-              </div>
-            );
-          })}
-
-          {uncategorized.length > 0 && (
-            <div className="board-col">
-              <CategorySectionHeader icon="star" name="Uncategorized" count={uncategorized.length} />
-              <div className="col-cards">{uncategorized.map((it) => renderCard(it, 'star'))}</div>
+                  <div className="board-col" key={block.key}>
+                    <CategorySectionHeader icon={block.icon} name={block.name} count={block.items.length} onEdit={block.onEdit} />
+                    {block.items.length === 0 ? (
+                      <p className="empty-mini">nothing here yet</p>
+                    ) : (
+                      <div className="col-cards">{block.items.map((it) => renderCard(it, block.icon))}</div>
+                    )}
+                  </div>
+                )
+              )}
             </div>
-          )}
-
-          <AddCategoryTile onClick={() => setGroupSheetOpen(true)} />
+          ))}
         </div>
       )}
 

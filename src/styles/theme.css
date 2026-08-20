@@ -475,8 +475,20 @@ header.app-header .signout {
 
 .board {
   display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+.board-column {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
   flex-direction: column;
-  gap: 26px;
+  gap: 20px;
+}
+.board-col {
+  background: #ffffffa8;
+  border-radius: 18px;
+  padding: 16px;
 }
 .col-cards {
   display: flex;
@@ -1165,28 +1177,6 @@ header.app-header .signout {
 
   .hero .big {
     font-size: 60px;
-  }
-
-  .board {
-    display: block;
-    column-count: 3;
-    column-gap: 20px;
-  }
-
-  .board-col,
-  .board-add {
-    break-inside: avoid;
-    margin-bottom: 20px;
-  }
-
-  .board-col {
-    background: #ffffffa8;
-    border-radius: 18px;
-    padding: 16px;
-  }
-
-  .board-add {
-    min-height: 120px;
   }
 }
 
