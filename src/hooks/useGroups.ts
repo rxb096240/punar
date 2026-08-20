@@ -57,5 +57,11 @@ export function useGroups(householdId: string | undefined) {
     return data;
   }
 
-  return { groups, loading, refresh, createGroup, updateGroup };
+  async function removeGroup(id: string) {
+    const { error } = await supabase.from('groups').delete().eq('id', id);
+    if (error) throw groupError(error);
+    await refresh();
+  }
+
+  return { groups, loading, refresh, createGroup, updateGroup, removeGroup };
 }

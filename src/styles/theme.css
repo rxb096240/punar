@@ -858,6 +858,15 @@ header.app-header .signout {
   cursor: pointer;
   padding: 0;
 }
+.sheet .link-btn.danger {
+  display: block;
+  color: var(--coral);
+  margin: 14px auto 0;
+}
+.sheet .link-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
 .icon-grid {
   display: grid;

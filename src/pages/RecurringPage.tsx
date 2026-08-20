@@ -167,6 +167,10 @@ export function RecurringPage() {
         editing={editingGroup}
         onCreate={groups.createGroup}
         onUpdate={groups.updateGroup}
+        onDelete={async (id) => {
+          await groups.removeGroup(id);
+          await recurring.refresh();
+        }}
       />
       <AddRecurringSheet
         open={addOpen || !!editingItem}
