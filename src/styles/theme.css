@@ -452,18 +452,14 @@ header.app-header .signout {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.section-edit {
-  background: none;
-  border: none;
-  color: var(--muted);
+.section-name-edit {
   cursor: pointer;
-  padding: 3px;
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
+  border-radius: 4px;
 }
-.section-edit:hover {
+.section-name-edit:hover,
+.section-name-edit:focus-visible {
   color: var(--accent);
+  outline: none;
 }
 .section-count {
   font-size: 11px;

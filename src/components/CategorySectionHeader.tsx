@@ -1,5 +1,5 @@
 import type { IconKey } from '../lib/types';
-import { Icon, EditIcon } from './icons';
+import { Icon } from './icons';
 
 export function CategorySectionHeader({
   icon,
@@ -17,11 +17,23 @@ export function CategorySectionHeader({
       <div className="section-icon">
         <Icon name={icon} size={14} />
       </div>
-      <h3>{name}</h3>
-      {onEdit && (
-        <button type="button" className="section-edit" onClick={onEdit} title="Edit category" aria-label="Edit category">
-          <EditIcon />
-        </button>
+      {onEdit ? (
+        <h3
+          className="section-name-edit"
+          role="button"
+          tabIndex={0}
+          onClick={onEdit}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onEdit();
+            }
+          }}
+        >
+          {name}
+        </h3>
+      ) : (
+        <h3>{name}</h3>
       )}
       <span className="section-count">
         {count} item{count === 1 ? '' : 's'}
