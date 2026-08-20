@@ -28,10 +28,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const candidates: { icon: IconKey; label: string; days: number }[] = [];
 
     for (const it of recurring.items) {
+      // Autopay items roll their own due date forward without any action
+      // from you, so they're never something to surface as "up next" —
+      // only items you might actually need to do something about, and
+      // only once they're close enough to matter.
+      if (it.payment_method === 'auto') continue;
+      const days = daysUntil(it.next_due_date);
+      if (days >= 10) continue;
       candidates.push({
         icon: (it.group_id && groupIcon.get(it.group_id)) || 'star',
         label: it.name,
-        days: daysUntil(it.next_due_date),
+        days,
       });
     }
     for (const t of todos.todos) {
