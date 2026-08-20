@@ -49,10 +49,19 @@ export function HouseholdProvider({ children }: { children: ReactNode }) {
       return;
     }
     setLoading(true);
-    const [{ data: list }, { data: settings }] = await Promise.all([
-      supabase.from('households').select('*').order('created_at', { ascending: true }),
-      supabase.from('user_settings').select('last_household_id').eq('user_id', user.id).maybeSingle(),
-    ]);
+    const fetchHouseholds = () =>
+      Promise.all([
+        supabase.from('households').select('*').order('created_at', { ascending: true }),
+        supabase.from('user_settings').select('last_household_id').eq('user_id', user.id).maybeSingle(),
+      ]);
+
+    let [{ data: list }, { data: settings }] = await fetchHouseholds();
+    // A household query can come back empty right after interactive sign-in
+    // if it raced the client still settling the new session — retry once
+    // rather than sending an actual household owner to onboarding.
+    if ((list ?? []).length === 0) {
+      [{ data: list }, { data: settings }] = await fetchHouseholds();
+    }
 
     const households = list ?? [];
     setHouseholds(households);

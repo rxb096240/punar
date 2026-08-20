@@ -21,7 +21,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession);
+      // Deferred: right after sign-in, Supabase's client can still be
+      // finishing up persisting the new session at the moment this fires.
+      // Updating state (which cascades into household queries) in the same
+      // tick can race that and query under the old, unauthenticated
+      // context — RLS then silently returns zero rows instead of erroring,
+      // which briefly looked like "no household yet". A macrotask tick is
+      // enough for the session to settle first.
+      setTimeout(() => setSession(newSession), 0);
     });
 
     return () => sub.subscription.unsubscribe();
