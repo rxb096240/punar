@@ -16,8 +16,9 @@ Supabase (Postgres + Auth + Row Level Security).
 - **Households** — sign up, create or join a household via invite code,
   and everyone in the household sees the same data (enforced by Postgres
   Row Level Security, not just the client).
-- Every new household is automatically seeded with a **Utilities** group
-  (Electricity, Gas, Water + Trash, Internet, Cable).
+- A new, empty household is offered starter sets — Utilities, Housing,
+  Home maintenance, Vehicle, Health, Subscriptions — as one-tap template
+  tiles instead of anything being seeded automatically.
 
 ## Stack
 

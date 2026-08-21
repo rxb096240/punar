@@ -6,13 +6,34 @@ export const RECURRING_TEMPLATES: {
   items: { name: string; interval: number; intervalMonths: number | null }[];
 }[] = [
   {
-    group: 'House',
-    icon: 'home',
+    group: 'Utilities',
+    icon: 'bill',
     items: [
-      { name: 'AC filter change', interval: 90, intervalMonths: 3 },
-      { name: 'Gutter cleaning', interval: 365, intervalMonths: 12 },
-      { name: 'Smoke detector batteries', interval: 365, intervalMonths: 12 },
-      { name: 'Water heater flush', interval: 365, intervalMonths: 12 },
+      { name: 'Electricity', interval: 30, intervalMonths: 1 },
+      { name: 'Gas', interval: 30, intervalMonths: 1 },
+      { name: 'Water + Trash', interval: 30, intervalMonths: 1 },
+      { name: 'Internet', interval: 30, intervalMonths: 1 },
+      { name: 'Cable', interval: 30, intervalMonths: 1 },
+    ],
+  },
+  {
+    group: 'Housing',
+    icon: 'landmark',
+    items: [
+      { name: 'Mortgage', interval: 30, intervalMonths: 1 },
+      { name: 'Property Tax', interval: 180, intervalMonths: 6 },
+      { name: 'Insurance', interval: 365, intervalMonths: 12 },
+      { name: 'HOA', interval: 30, intervalMonths: 1 },
+    ],
+  },
+  {
+    group: 'Home maintenance',
+    icon: 'tool',
+    items: [
+      { name: 'Lawn mow', interval: 14, intervalMonths: null },
+      { name: 'Water softener salt', interval: 30, intervalMonths: 1 },
+      { name: 'Pest control', interval: 90, intervalMonths: 3 },
+      { name: 'AC filter', interval: 90, intervalMonths: 3 },
     ],
   },
   {
@@ -34,11 +55,14 @@ export const RECURRING_TEMPLATES: {
     ],
   },
   {
-    group: 'Bills',
-    icon: 'bill',
+    group: 'Subscriptions',
+    icon: 'tv',
     items: [
-      { name: 'Property tax', interval: 180, intervalMonths: 6 },
-      { name: 'Home insurance', interval: 365, intervalMonths: 12 },
+      { name: 'Netflix', interval: 30, intervalMonths: 1 },
+      { name: 'Prime', interval: 30, intervalMonths: 1 },
+      { name: 'Hulu', interval: 30, intervalMonths: 1 },
+      { name: 'HBO Max', interval: 30, intervalMonths: 1 },
+      { name: 'Doordash', interval: 30, intervalMonths: 1 },
     ],
   },
 ];
