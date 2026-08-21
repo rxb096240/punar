@@ -21,7 +21,14 @@ export function AuthPage() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
-        const { error } = await supabase.auth.signUp({ email, password });
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          // Without this, the confirmation email falls back to the shared
+          // Supabase project's Site URL — which may point at a different
+          // app sharing this project (e.g. pickframe) rather than punar.
+          options: { emailRedirectTo: window.location.origin },
+        });
         if (error) throw error;
         setInfo('Check your inbox to confirm your email, then sign in.');
       }
